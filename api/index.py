@@ -661,6 +661,7 @@ def apply_filters(ads, params):
     mileage_preset = params.get("mileage_preset")
     min_mileage = params.get("min_mileage"); max_mileage = params.get("max_mileage")
     f_trans = params.get("transmission"); f_fuel = params.get("fuel_type"); f_body = params.get("body_type")
+    f_loc = params.get("location")
     out = []
     for r in ads:
         price = r.get("price"); year = r.get("year"); mileage = r.get("mileage")
@@ -681,6 +682,7 @@ def apply_filters(ads, params):
         if f_body:
             bt = r.get("body_type")
             if bt is None or bt.lower() != f_body.lower(): continue
+        if f_loc and f_loc not in str(r.get("location", "")): continue
         out.append(r)
     return out
 
@@ -778,9 +780,49 @@ def process_search_results(ads, query=""):
         })
     return out
 
+def extract_budget(text):
+    def scale(val, unit):
+        if not unit: return val if val >= 10000 else val * 1000000
+        u = unit.lower()
+        if u in ("m", "مليون"): return val * 1000000
+        if u in ("k", "الف", "ألف"): return val * 1000
+        return val
+
+    # Interval: من X لـ Y
+    m = re.search(r'(?:من\s*)?(\d+(?:\.\d+)?)\s*(m|مليون|k|الف)?\s*(?:-|to|حتى|لحد|الى|لـ)\s*(\d+(?:\.\d+)?)\s*(m|مليون|k|الف)?', text)
+    if m:
+        u_fin = m.group(4) or m.group(2)
+        v1, v2 = scale(float(m.group(1)), u_fin), scale(float(m.group(3)), u_fin)
+        return min(v1, v2), max(v1, v2)
+
+    # Upper bound: تحت X
+    m = re.search(r'(?:تحت|اقل من|حتى|في حدود|سقف)\s*(\d+(?:\.\d+)?)\s*(m|مليون|k|الف)?', text)
+    if m:
+        return None, scale(float(m.group(1)), m.group(2))
+
+    # Exact Point: بـ X
+    m = re.search(r'(?:بـ|ب|معايا)\s*(\d+(?:\.\d+)?)\s*(m|مليون|k|الف)', text)
+    if m:
+        v = scale(float(m.group(1)), m.group(2))
+        return v * 0.85, v * 1.15
+    return None, None
+
+def extract_location(text):
+    location_map = {
+        "تجمع": "التجمع", "التجمع": "التجمع", "cairo": "القاهرة", "القاهرة": "القاهرة",
+        "مدينة نصر": "مدينة نصر", "مصر الجديدة": "مصر الجديدة", "المعادي": "المعادي",
+        "زايد": "الشيخ زايد", "الشيخ زايد": "الشيخ زايد", "اكتوبر": "اكتوبر",
+        "اسكندرية": "الإسكندرية", "alexandria": "الإسكندرية", "الجيزة": "الجيزة"
+    }
+    for key, val in location_map.items():
+        if key in text:
+            return val
+    return None
+
 def normalize_query(query):
     q = normalize_digits(query.strip())
     q = re.sub(r"\s+", " ", q)
+    q_lower = q.lower()
     brands_map = {
         "kia":"kia","\u0643\u064a\u0627":"kia","mercedes":"mercedes","mercedes-benz":"mercedes",
         "\u0645\u0631\u0633\u064a\u062f\u0633":"mercedes","hyundai":"hyundai","\u0647\u064a\u0648\u0646\u062f\u0627\u064a":"hyundai",
@@ -803,7 +845,7 @@ def normalize_query(query):
         "prado":"prado","civic":"civic","accord":"accord","cruze":"cruze","aveo":"aveo",
         "rav4":"rav4",
     }
-    q_lower = q.lower()
+    
     detected_brand = None; detected_model = None; detected_year = None
     year_match = re.search(r"\b(19\d{2}|20[012]\d)\b", q_lower)
     if year_match:
@@ -823,7 +865,19 @@ def normalize_query(query):
     if not detected_brand:
         words = [w for w in re.findall(r"[a-zA-Z\u0600-\u06FF]+", q_lower) if not w.isdigit()]
         detected_brand = words[0] if words else q_lower
-    return {"make": detected_brand, "model": detected_model, "year": detected_year, "normalized_query": q}
+        
+    min_p, max_p = extract_budget(q_lower)
+    loc = extract_location(q_lower)
+    
+    return {
+        "make": detected_brand, 
+        "model": detected_model, 
+        "year": detected_year, 
+        "min_price": min_p,
+        "max_price": max_p,
+        "location": loc,
+        "normalized_query": q
+    }
 
 # ── Routes ─────────────────────────────────────────────────────────────────────
 @app.route("/api/health", methods=["GET"])
@@ -949,355 +1003,6 @@ def image_proxy():
         print("Image proxy error:", e)
         return "Upstream error", 502
 
-# ── Vision health diagnostic ──────────────────────────────────────────────────
-@app.route("/api/vision-health", methods=["GET"])
-def vision_health():
-    hf_token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
-    openai_key = os.environ.get("OPENAI_API_KEY")
-    vision_key = os.environ.get("VISION_API_KEY") or os.environ.get("GOOGLE_VISION_API_KEY")
-    
-    token_status = "configured" if hf_token else "missing"
-    openai_key_status = "configured" if openai_key else "missing"
-    vision_key_status = "configured" if vision_key else "missing"
-
-    active_provider = "HuggingFace Hub Inference Client" if hf_token else (
-        "OpenAI Vision API" if openai_key else (
-            "Google Cloud Vision API" if vision_key else "None (Unconfigured)"
-        )
-    )
-
-    probe_result = "not_probed"
-    probe_status = 200
-
-    if hf_token:
-        try:
-            from PIL import Image as _PIL_Image
-            buf = io.BytesIO()
-            _PIL_Image.new("RGB", (32, 32), (200, 100, 50)).save(buf, format="JPEG")
-            probe_bytes = buf.getvalue()
-            headers = {"Authorization": f"Bearer {hf_token}", "Content-Type": "image/jpeg"}
-            resp = requests.post("https://router.huggingface.co/hf-inference/models/dima806/car_models_image_detection", data=probe_bytes, headers=headers, timeout=12)
-            probe_status = resp.status_code
-            probe_result = "200_ok" if resp.status_code == 200 else f"http_{resp.status_code}"
-        except Exception as ex:
-            probe_result = f"error: {type(ex).__name__}: {ex}"
-
-    status_str = "ready" if (hf_token and probe_status == 200) or openai_key or vision_key else "unconfigured"
-
-    return jsonify({
-        "service": "vehicle-vision",
-        "status": status_str,
-        "active_provider": active_provider,
-        "model": "dima806/car_models_image_detection",
-        "env_vars": {
-            "HF_TOKEN": token_status,
-            "OPENAI_API_KEY": openai_key_status,
-            "VISION_API_KEY": vision_key_status,
-        },
-        "probe_status": probe_status,
-        "probe_result": probe_result,
-        "pil_available": HAS_PIL
-    })
-
-# ── Image classification ───────────────────────────────────────────────────────
-HF_ROUTER_URL = "https://router.huggingface.co/hf-inference/models/dima806/car_models_image_detection"
-
-def _prepare_image_bytes(file_storage):
-    """Read, decode, normalize orientation, convert to RGB, resize, re-encode as JPEG.
-    Returns (jpeg_bytes, None) on success or (None, error_str) on failure."""
-    try:
-        raw = file_storage.read()
-    except Exception as ex:
-        return None, f"INVALID_IMAGE: could not read upload bytes: {ex}"
-    if not raw or len(raw) == 0:
-        return None, "INVALID_IMAGE: uploaded file is empty"
-    
-    if len(raw) > 15 * 1024 * 1024:
-        return None, "INVALID_IMAGE: file size exceeds 15MB limit"
-
-    try:
-        probe = Image.open(io.BytesIO(raw))
-        probe.verify()
-    except Exception as ex:
-        return None, f"INVALID_IMAGE: image verification failed: {type(ex).__name__}: {ex}"
-    
-    try:
-        img = Image.open(io.BytesIO(raw))
-    except Exception as ex:
-        return None, f"INVALID_IMAGE: could not re-open image: {ex}"
-    
-    try:
-        from PIL import ImageOps
-        img = ImageOps.exif_transpose(img)
-    except Exception:
-        pass
-    
-    try:
-        if img.mode != "RGB":
-            img = img.convert("RGB")
-    except Exception as ex:
-        return None, f"INVALID_IMAGE: color conversion failed: {ex}"
-    
-    try:
-        img.thumbnail((640, 640), Image.LANCZOS)
-    except Exception:
-        try:
-            img.thumbnail((640, 640))
-        except Exception as ex:
-            return None, f"INVALID_IMAGE: resize failed: {ex}"
-    
-    try:
-        buf = io.BytesIO()
-        img.save(buf, format="JPEG", quality=88)
-        return buf.getvalue(), None
-    except Exception as ex:
-        return None, f"INVALID_IMAGE: JPEG re-encode failed: {ex}"
-
-def _parse_hf_label(label_raw):
-    """Parse HF label like 'Kia_Sportage' or 'Kia_Sportage_2022' into structured make/model/year.
-    Does NOT manufacture or append an arbitrary year if not present in original label."""
-    label = label_raw.replace("_", " ").strip()
-    parts = label.split()
-    make = parts[0] if len(parts) >= 1 else label
-    year = None
-    model_parts = []
-    for p in parts[1:]:
-        if re.match(r'^(19|20)\d{2}$', p):
-            year = int(p)
-        else:
-            model_parts.append(p)
-    model = " ".join(model_parts) if model_parts else ""
-    return {
-        "display_label": label,
-        "make": make,
-        "model": model,
-        "year_detected": year,
-    }
-
-def _call_hf_vision_api(img_bytes):
-    """Executes real trained model inference via Hugging Face InferenceClient / Router API.
-    Returns (result_dict, error_dict)."""
-    hf_token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
-    if not hf_token:
-        return None, {"success": False, "code": "VISION_SERVICE_UNAVAILABLE", "error": "HF_TOKEN environment variable is missing.", "status_code": 503}
-
-    try:
-        from huggingface_hub import InferenceClient
-        client = InferenceClient(provider="hf-inference", token=hf_token)
-        hf_predictions = client.image_classification(img_bytes, model="dima806/car_models_image_detection")
-        
-        # Convert InferenceClient output objects to dicts
-        raw_list = []
-        for pred in hf_predictions:
-            lbl = getattr(pred, "label", None) or (pred.get("label") if isinstance(pred, dict) else "")
-            sc = getattr(pred, "score", None) or (pred.get("score") if isinstance(pred, dict) else 0.0)
-            raw_list.append({"label": str(lbl), "score": float(sc)})
-        
-        return {"data": raw_list, "model": "dima806/car_models_image_detection", "provider": "Hugging Face InferenceClient"}, None
-    except Exception as ex_hub:
-        print(f"[vision] InferenceClient failed: {type(ex_hub).__name__}: {ex_hub}. Trying direct router request...")
-
-    # Direct Router HTTP POST fallback
-    headers = {
-        "Authorization": f"Bearer {hf_token}",
-        "Accept": "application/json",
-        "Content-Type": "image/jpeg"
-    }
-
-    try:
-        resp = requests.post(HF_ROUTER_URL, data=img_bytes, headers=headers, timeout=25)
-        if resp.status_code == 200:
-            data = resp.json()
-            if isinstance(data, list) and len(data) > 0:
-                raw_list = [{"label": str(x.get("label","")), "score": float(x.get("score",0.0))} for x in data]
-                return {"data": raw_list, "model": "dima806/car_models_image_detection", "provider": "Hugging Face Router API"}, None
-            return None, {"success": False, "code": "VEHICLE_NOT_IDENTIFIED", "error": "Vision API returned empty result.", "status_code": 422}
-        
-        if resp.status_code in (401, 403):
-            return None, {"success": False, "code": "VISION_SERVICE_UNAVAILABLE", "error": f"HuggingFace API authentication failed (HTTP {resp.status_code}). Check HF_TOKEN.", "status_code": 503}
-        
-        return None, {"success": False, "code": "VISION_SERVICE_UNAVAILABLE", "error": f"HuggingFace vision service returned HTTP {resp.status_code}.", "status_code": 503}
-
-    except Exception as ex:
-        print(f"[vision] HF direct router request failed: {type(ex).__name__}: {ex}")
-        return None, {"success": False, "code": "VISION_SERVICE_UNAVAILABLE", "error": f"Could not connect to vision AI provider: {type(ex).__name__}", "status_code": 503}
-
-def _call_openai_vision_api(img_bytes):
-    """Executes real multimodal AI vision inference via OpenAI gpt-4o-mini if OPENAI_API_KEY is present."""
-    openai_key = os.environ.get("OPENAI_API_KEY")
-    if not openai_key:
-        return None
-
-    import base64
-    import json
-    b64_img = base64.b64encode(img_bytes).decode('utf-8')
-
-    headers = {
-        "Authorization": f"Bearer {openai_key}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model": "gpt-4o-mini",
-        "messages": [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "Identify the vehicle in this photo. Return ONLY a valid JSON object with keys: \"is_vehicle\" (boolean), \"make\" (string or null), \"model\" (string or null), \"confidence\" (float 0.0 to 1.0), \"estimated_year_from\" (integer or null), \"estimated_year_to\" (integer or null), \"alternatives\" (array of {make, model, confidence}). If the image is not a vehicle or cannot be identified, set is_vehicle to false."
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{b64_img}"}
-                    }
-                ]
-            }
-        ],
-        "response_format": {"type": "json_object"},
-        "temperature": 0.1,
-        "max_tokens": 300
-    }
-
-    try:
-        r = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=25)
-        if r.status_code == 200:
-            res_data = r.json()
-            content_str = res_data["choices"][0]["message"]["content"]
-            parsed_json = json.loads(content_str)
-            return parsed_json
-    except Exception as ex:
-        print(f"[vision] OpenAI Vision API call failed: {ex}")
-        return None
-
-@app.route("/api/classify", methods=["POST"])
-def classify_image():
-    # ── 1. PIL check ──────────────────────────────────────────────────────────
-    if not HAS_PIL or Image is None:
-        return jsonify({
-            "success": False,
-            "vehicle_detected": False,
-            "code": "INVALID_IMAGE",
-            "error": "Server-side image processing library unavailable (PIL/Pillow not installed)."
-        }), 500
-
-    # ── 2. Upload presence check ──────────────────────────────────────────────
-    if "image" not in request.files:
-        return jsonify({
-            "success": False,
-            "vehicle_detected": False,
-            "code": "INVALID_IMAGE",
-            "error": "No image file received. The field name must be 'image'."
-        }), 400
-
-    file = request.files["image"]
-    if not file or file.filename == "":
-        return jsonify({
-            "success": False,
-            "vehicle_detected": False,
-            "code": "INVALID_IMAGE",
-            "error": "Empty file upload received."
-        }), 400
-
-    selected_crop_id_raw = request.form.get("selected_crop_id")
-    selected_crop_id = int(selected_crop_id_raw) if (selected_crop_id_raw is not None and selected_crop_id_raw.isdigit()) else None
-
-    # ── 3. Image decode & EXIF transpose ─────────────────────────────────────
-    pil_img, prep_error = prepare_image(file)
-    if prep_error:
-        print(f"[classify] Image prep failed: {prep_error}")
-        return jsonify({
-            "success": False,
-            "vehicle_detected": False,
-            "code": "INVALID_IMAGE",
-            "error": prep_error
-        }), 400
-
-    # ── 4. STAGE 1: Vehicle Detection & Non-Car Rejection ─────────────────────
-    detection_res = detect_vehicle_rois(pil_img)
-    if not detection_res.get("is_car"):
-        return jsonify({
-            "success": False,
-            "vehicle_detected": False,
-            "code": "NON_CAR_IMAGE",
-            "error": detection_res.get("reason", "The uploaded image does not appear to contain a vehicle. Please upload a clear exterior photo of a car.")
-        }), 422
-
-    rois = detection_res.get("rois", [])
-
-    # Multi-vehicle detection flow
-    if len(rois) > 1 and selected_crop_id is None:
-        vehicle_crops = []
-        for r_item in rois:
-            c_id = r_item["crop_id"]
-            bbox = r_item["bbox"]
-            vehicle_crops.append({
-                "crop_id": c_id,
-                "bbox": bbox,
-                "preview_b64": crop_to_b64(pil_img, bbox)
-            })
-        return jsonify({
-            "success": True,
-            "vehicle_detected": True,
-            "multiple_vehicles_detected": True,
-            "vehicle_count": len(vehicle_crops),
-            "vehicles": vehicle_crops,
-            "message": "Multiple vehicles detected in photo. Please select which vehicle to analyze."
-        }), 200
-
-    target_roi = rois[0] if (selected_crop_id is None or selected_crop_id >= len(rois)) else rois[selected_crop_id]
-    target_bbox = target_roi["bbox"]
-
-    img_bytes = crop_to_bytes(pil_img, target_bbox)
-    cropped_pil = pil_img.crop((target_bbox[0], target_bbox[1], target_bbox[2], target_bbox[3]))
-
-    visual_emb = extract_visual_embedding(cropped_pil)
-
-    # ── 5. STAGES 2-5: Rebuilt Multi-Stage Recognition Pipeline ───────────────
-    vision_res = run_vision_pipeline(cropped_pil, img_bytes, target_bbox)
-
-    if not vision_res.get("vehicle_detected") or not vision_res.get("identification"):
-        return jsonify({
-            "success": False,
-            "vehicle_detected": False,
-            "code": "VEHICLE_NOT_IDENTIFIED",
-            "error": vision_res.get("error", "Vehicle could not be identified reliably. Please upload a clearer photo."),
-            "identification": None,
-            "confidence": vision_res.get("confidence"),
-            "visual_evidence": vision_res.get("visual_evidence", []),
-            "ocr_evidence": vision_res.get("ocr_evidence", []),
-            "alternatives": [],
-            "needs_confirmation": False,
-            "debug_info": vision_res.get("debug_info", {})
-        }), 422
-
-    ident = vision_res["identification"]
-    conf_obj = vision_res["confidence"]
-    label_str = f"{ident['make']} {ident['model']}".strip()
-    conf_percent = round(conf_obj["overall"] * 100, 1)
-
-    return jsonify({
-        "success": True,
-        "vehicle_detected": True,
-        "label": label_str,
-        "make": ident["make"],
-        "model": ident["model"],
-        "generation": ident["generation"],
-        "year_estimate": ident["year_estimate"],
-        "body_type": ident["body_type"],
-        "confidence": conf_percent,
-        "identification": ident,
-        "confidence_breakdown": conf_obj,
-        "visual_evidence": vision_res.get("visual_evidence", []),
-        "ocr_evidence": vision_res.get("ocr_evidence", []),
-        "alternatives": vision_res.get("alternatives", []),
-        "needs_confirmation": vision_res.get("needs_confirmation", False),
-        "visual_embedding": visual_emb,
-        "engine": vision_res.get("debug_info", {}).get("engine", "multi_stage_vision_pipeline"),
-        "provider": vision_res.get("debug_info", {}).get("provider", "Apex Motors Vision Engine"),
-        "note": "Identification uncertain — please select or confirm candidate model below." if vision_res.get("needs_confirmation") else "Visual identification completed via multi-stage computer vision.",
-        "debug_info": vision_res.get("debug_info", {})
-    }), 200
-
 @app.route("/api/search", methods=["GET"])
 def search():
     query = request.args.get("q","").strip()
@@ -1310,22 +1015,31 @@ def search():
         v = request.args.get(k)
         try: return int(v) if v else None
         except: return None
-    filter_params = {
-        "min_price":_float("min_price"),"max_price":_float("max_price"),
-        "min_year":_int("min_year"),"max_year":_int("max_year"),
-        "mileage_preset":request.args.get("mileage_preset") or None,
-        "min_mileage":_float("min_mileage"),"max_mileage":_float("max_mileage"),
-        "transmission":request.args.get("transmission") or None,
-        "fuel_type":request.args.get("fuel_type") or None,
-        "body_type":request.args.get("body_type") or None,
-    }
-    has_filters = any(v is not None for v in filter_params.values())
+        
     if not query:
         return jsonify({"query":"","brand":"","model":"","page":page,"has_more":False,"results":[],"filters_active":False})
+        
     parsed = normalize_query(query)
-    detected_brand = parsed["make"]; detected_model = parsed["model"]
+    detected_brand = parsed["make"]
+    detected_model = parsed["model"]
+    
+    filter_params = {
+        "min_price": _float("min_price") or parsed.get("min_price"), 
+        "max_price": _float("max_price") or parsed.get("max_price"),
+        "min_year": _int("min_year"), "max_year": _int("max_year"),
+        "mileage_preset": request.args.get("mileage_preset") or None,
+        "min_mileage": _float("min_mileage"), "max_mileage": _float("max_mileage"),
+        "transmission": request.args.get("transmission") or None,
+        "fuel_type": request.args.get("fuel_type") or None,
+        "body_type": request.args.get("body_type") or None,
+        "location": parsed.get("location")
+    }
+    
     if parsed["year"] and not filter_params.get("min_year") and not filter_params.get("max_year"):
-        filter_params["min_year"] = parsed["year"]; filter_params["max_year"] = parsed["year"]; has_filters = True
+        filter_params["min_year"] = parsed["year"]; filter_params["max_year"] = parsed["year"]
+        
+    has_filters = any(v is not None for v in filter_params.values())
+
     all_raw = []; seen_urls = set()
     max_pages = 3 if has_filters else 2
     for extra_page in range(page, page + max_pages):
@@ -1336,6 +1050,7 @@ def search():
             if u not in seen_urls:
                 seen_urls.add(u); all_raw.append(item)
         if len(apply_filters(all_raw, filter_params)) >= 24: break
+        
     filtered = apply_filters(all_raw, filter_params)
     prices = [r["price"] for r in filtered if r.get("price")]
     price_stats = None
@@ -1343,6 +1058,7 @@ def search():
         price_stats = {"min":int(min(prices)),"max":int(max(prices)),"median":int(sorted(prices)[len(prices)//2]),"count":len(prices)}
     filtered = filtered[:24]
     formatted = process_search_results(filtered, query=query)
+    
     return jsonify({
         "query":query,"brand":detected_brand,"model":detected_model or "",
         "parsed_year":parsed["year"],"page":page,"has_more":len(filtered)>=20,
