@@ -57,46 +57,13 @@ h1 span{color:var(--blue);text-shadow:0 0 30px rgba(56,189,248,.5)}
 /* ── Search bar ───────────────────────────────────────────────────────────── */
 .search-wrap{max-width:860px;margin:0 auto 10px}
 .search-row{display:flex;gap:10px;align-items:center}
-.search-form{flex:1;display:flex;align-items:center;height:54px;padding:0 12px 0 22px;gap:10px;background:linear-gradient(180deg,rgba(15,23,42,.93),rgba(3,7,18,.97));border:1.2px solid rgba(56,189,248,.42);border-radius:999px;box-shadow:0 16px 48px rgba(0,0,0,.75),inset 0 1px 0 rgba(56,189,248,.18);backdrop-filter:blur(18px)}
-.search-input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:.95rem;font-family:'Inter',sans-serif}
+.search-form{flex:1;display:flex;align-items:center;height:60px;padding:0 12px 0 22px;gap:10px;background:linear-gradient(180deg,rgba(15,23,42,.93),rgba(3,7,18,.97));border:1.2px solid rgba(56,189,248,.42);border-radius:999px;box-shadow:0 16px 48px rgba(0,0,0,.75),inset 0 1px 0 rgba(56,189,248,.18);backdrop-filter:blur(18px)}
+.search-input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-size:1.05rem;font-family:'Inter',sans-serif}
 .search-input::placeholder{color:#94a3b8}
-.cam-btn{background:transparent;border:none;cursor:pointer;font-size:1.2rem;opacity:.85;transition:transform .2s,opacity .2s;flex-shrink:0}
+.cam-btn{background:transparent;border:none;cursor:pointer;font-size:1.3rem;opacity:.85;transition:transform .2s,opacity .2s;flex-shrink:0}
 .cam-btn:hover{transform:scale(1.18);opacity:1}
-.search-btn{background:var(--blue-dim);border:1px solid var(--blue);color:#fff;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:700;padding:7px 18px;border-radius:999px;cursor:pointer;transition:background .2s,box-shadow .2s;white-space:nowrap}
+.search-btn{background:var(--blue-dim);border:1px solid var(--blue);color:#fff;font-family:'Inter',sans-serif;font-size:.95rem;font-weight:700;padding:9px 24px;border-radius:999px;cursor:pointer;transition:background .2s,box-shadow .2s;white-space:nowrap}
 .search-btn:hover{background:var(--blue-glow);box-shadow:0 0 14px var(--blue-glow)}
-.filter-toggle-btn{background:rgba(15,23,42,.8);border:1px solid var(--border);color:var(--blue);padding:0 18px;height:44px;border-radius:22px;font-size:.85rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;white-space:nowrap;flex-shrink:0}
-.filter-toggle-btn:hover,.filter-toggle-btn.open{background:var(--blue-dim);border-color:var(--blue)}
-.filter-badge{background:var(--blue);color:#000;border-radius:50%;width:18px;height:18px;font-size:.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
-
-/* ── Filter panel ─────────────────────────────────────────────────────────── */
-.filter-panel{max-width:860px;margin:8px auto 0;background:rgba(10,14,22,.92);border:1px solid var(--border);border-radius:14px;padding:18px 20px 16px;backdrop-filter:blur(16px);display:none}
-.filter-panel.open{display:block}
-.filter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 20px}
-@media(max-width:768px){.filter-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:500px){.filter-grid{grid-template-columns:1fr}}
-.f-group{display:flex;flex-direction:column;gap:5px}
-.f-label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-.f-input,.f-select{background:rgba(15,23,42,.7);border:1px solid rgba(56,189,248,.25);border-radius:8px;color:#fff;font-family:'Inter',sans-serif;font-size:.85rem;padding:7px 10px;outline:none;transition:border-color .2s;width:100%}
-.f-input:focus,.f-select:focus{border-color:var(--blue)}
-.f-select option{background:#0f172a}
-.f-range-row{display:flex;gap:8px;align-items:center}
-.f-range-row .f-input{flex:1}
-.f-range-sep{color:var(--muted);font-size:.8rem;flex-shrink:0}
-.f-presets{display:flex;flex-wrap:wrap;gap:6px}
-.f-preset{background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);color:var(--muted);border-radius:20px;padding:4px 12px;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
-.f-preset:hover{background:var(--blue-dim);color:#fff;border-color:var(--blue)}
-.f-preset.active{background:var(--blue-dim);border-color:var(--blue);color:#fff}
-.filter-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
-.btn-apply{background:var(--blue);color:#000;border:none;border-radius:8px;padding:8px 22px;font-size:.85rem;font-weight:800;font-family:'Inter',sans-serif;cursor:pointer;transition:opacity .2s}
-.btn-apply:hover{opacity:.85}
-.btn-clear{background:transparent;border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:8px;padding:8px 16px;font-size:.82rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s}
-.btn-clear:hover{background:rgba(239,68,68,.12)}
-
-/* ── Active filter chips ─────────────────────────────────────────────────── */
-.chips-row{max-width:860px;margin:8px auto 0;display:flex;flex-wrap:wrap;gap:7px;min-height:0}
-.chip{display:inline-flex;align-items:center;gap:5px;background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);border-radius:20px;padding:4px 10px 4px 12px;font-size:.76rem;color:#bae6fd;font-weight:600}
-.chip-x{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:.85rem;line-height:1;padding:0 2px;transition:color .15s}
-.chip-x:hover{color:#fca5a5}
 
 /* ── Image preview ───────────────────────────────────────────────────────── */
 .img-preview-wrap{display:none;align-items:center;gap:12px;max-width:860px;margin:10px auto 0;background:rgba(15,23,42,.82);border:1px solid rgba(56,189,248,.3);border-radius:12px;padding:8px 14px;backdrop-filter:blur(10px)}
@@ -317,16 +284,16 @@ h1 span{color:var(--blue);text-shadow:0 0 30px rgba(56,189,248,.5)}
     <div class="feat-item" role="listitem"><div class="feat-icon">⌁</div><div class="feat-title">Analysis</div><div class="feat-desc">Understand your needs</div></div>
     <div class="feat-item" role="listitem"><div class="feat-icon">▧</div><div class="feat-title">Image Detection</div><div class="feat-desc">Identify car details</div></div>
     <div class="feat-item" role="listitem"><div class="feat-icon">◇</div><div class="feat-title">Price Insights</div><div class="feat-desc">Fair market estimates</div></div>
-    <div class="feat-item" role="listitem"><div class="feat-icon">▥</div><div class="feat-title">Smart Filters</div><div class="feat-desc">Narrow your search</div></div>
+    <div class="feat-item" role="listitem"><div class="feat-icon">▥</div><div class="feat-title">Smart Results</div><div class="feat-desc">Best matches for you</div></div>
   </div>
 
-  <!-- Search + filter toggle -->
+  <!-- Search bar -->
   <div class="search-wrap">
     <div class="search-row">
       <form class="search-form" id="search-form" onsubmit="event.preventDefault(); initiateSearch();">
         <div class="ac-wrap" style="flex:1;position:relative">
           <input type="text" id="search-input" class="search-input"
-            placeholder="Try 'Toyota Corolla', 'Kia Sportage 22', 'Mercedes C180'…"
+            placeholder="e.g. Mercedes CLA 2022 فابريكا في التجمع تحت 3 مليون"
             autocomplete="off" aria-label="Search for a vehicle"
             aria-autocomplete="list" aria-haspopup="listbox">
           <div class="ac-dropdown" id="ac-dropdown" style="display:none" role="listbox"></div>
@@ -336,99 +303,7 @@ h1 span{color:var(--blue);text-shadow:0 0 30px rgba(56,189,248,.5)}
         <input type="file" id="file-input" accept="image/*" style="display:none" aria-label="Car image file input">
         <button type="submit" class="search-btn">Search</button>
       </form>
-      <button class="filter-toggle-btn" id="filter-toggle" type="button" onclick="toggleFilters()" aria-expanded="false">
-        ⚙ Filters <span class="filter-badge" id="filter-badge" style="display:none">0</span>
-      </button>
     </div>
-
-    <!-- Filter panel -->
-    <div class="filter-panel" id="filter-panel" role="region" aria-label="Search filters">
-      <div class="filter-grid">
-        <!-- Make -->
-        <div class="f-group">
-          <label class="f-label" for="f-make">Make</label>
-          <select class="f-select" id="f-make" onchange="updateModelOptions()">
-            <option value="">All Makes</option>
-            <option>Toyota</option><option>Kia</option><option>Hyundai</option>
-            <option>Mercedes</option><option>BMW</option><option>Nissan</option>
-            <option>Audi</option><option>Chevrolet</option><option>Renault</option>
-            <option>Peugeot</option><option>MG</option><option>Ford</option>
-            <option>Honda</option><option>Mazda</option><option>Mitsubishi</option>
-            <option>Volkswagen</option><option>Skoda</option><option>Fiat</option>
-            <option>Jeep</option><option>Suzuki</option><option>Opel</option>
-            <option>BYD</option><option>Chery</option>
-          </select>
-        </div>
-        <!-- Model -->
-        <div class="f-group">
-          <label class="f-label" for="f-model">Model</label>
-          <select class="f-select" id="f-model">
-            <option value="">All Models</option>
-          </select>
-        </div>
-        <!-- Body type -->
-        <div class="f-group">
-          <label class="f-label" for="f-body">Body Type</label>
-          <select class="f-select" id="f-body">
-            <option value="">Any Type</option>
-            <option>Sedan</option><option>SUV</option><option>Hatchback</option>
-            <option>Coupe</option><option>Van</option><option>Pickup</option>
-          </select>
-        </div>
-        <!-- Year range -->
-        <div class="f-group">
-          <label class="f-label">Year Range</label>
-          <div class="f-range-row">
-            <input class="f-input" id="f-year-min" type="number" placeholder="From" min="1990" max="2027">
-            <span class="f-range-sep">–</span>
-            <input class="f-input" id="f-year-max" type="number" placeholder="To" min="1990" max="2027">
-          </div>
-        </div>
-        <!-- Price range -->
-        <div class="f-group">
-          <label class="f-label">Price (EGP)</label>
-          <div class="f-range-row">
-            <input class="f-input" id="f-price-min" type="number" placeholder="Min" min="0">
-            <span class="f-range-sep">–</span>
-            <input class="f-input" id="f-price-max" type="number" placeholder="Max" min="0">
-          </div>
-        </div>
-        <!-- Transmission -->
-        <div class="f-group">
-          <label class="f-label" for="f-trans">Transmission</label>
-          <select class="f-select" id="f-trans">
-            <option value="">Any</option>
-            <option>Automatic</option><option>Manual</option>
-          </select>
-        </div>
-        <!-- Mileage presets -->
-        <div class="f-group" style="grid-column:1/-1">
-          <label class="f-label">Mileage</label>
-          <div class="f-presets">
-            <button class="f-preset" data-preset="" type="button" onclick="setMileagePreset(this,'')">All</button>
-            <button class="f-preset" data-preset="zero" type="button" onclick="setMileagePreset(this,'zero')">0 km (Brand new)</button>
-            <button class="f-preset" data-preset="under_1000" type="button" onclick="setMileagePreset(this,'under_1000')">Under 1,000 km</button>
-            <button class="f-preset" data-preset="under_100000" type="button" onclick="setMileagePreset(this,'under_100000')">Under 100,000 km</button>
-            <button class="f-preset" data-preset="custom" type="button" onclick="setMileagePreset(this,'custom')">Custom range</button>
-          </div>
-          <div id="mileage-custom" style="display:none;margin-top:8px">
-            <div class="f-range-row">
-              <input class="f-input" id="f-km-min" type="number" placeholder="Min km" min="0">
-              <span class="f-range-sep">–</span>
-              <input class="f-input" id="f-km-max" type="number" placeholder="Max km" min="0">
-            </div>
-            <small style="color:#64748b;font-size:.71rem;margin-top:4px;display:block">ℹ Listings with unknown mileage are excluded from any mileage filter</small>
-          </div>
-        </div>
-      </div>
-      <div class="filter-actions">
-        <button class="btn-clear" type="button" onclick="clearFilters()">✕ Clear all</button>
-        <button class="btn-apply" type="button" onclick="applyFilters()">Apply Filters</button>
-      </div>
-    </div>
-
-    <!-- Active filter chips -->
-    <div class="chips-row" id="chips-row"></div>
   </div>
 
   <!-- Image preview -->
@@ -525,8 +400,6 @@ let currentQuery    = "";
 let currentPage     = 1;
 let totalLoaded     = 0;
 let loadedUrls      = new Set();
-let activeFilters   = {};     // holds current applied filters
-let mileagePreset   = "";     // '', 'zero', 'under_1000', 'under_100000', 'custom'
 let lastPriceStats  = null;
 let lastAnalysis    = null;   // { label, confidence, note, alternatives }
 let allResults      = [];     // accumulates all loaded result objects for PDF
@@ -762,149 +635,6 @@ function correctSearch(){
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/*  FILTER MANAGEMENT                                                          */
-/* ─────────────────────────────────────────────────────────────────────────── */
-function toggleFilters(){
-  const panel = $('filter-panel');
-  const btn   = $('filter-toggle');
-  const open  = panel.classList.toggle('open');
-  btn.classList.toggle('open', open);
-  btn.setAttribute('aria-expanded', open);
-}
-
-function setMileagePreset(el, preset){
-  document.querySelectorAll('.f-preset').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  mileagePreset = preset;
-  $('mileage-custom').style.display = preset === 'custom' ? 'block' : 'none';
-}
-
-function updateModelOptions(){
-  const make = $('f-make').value;
-  const sel  = $('f-model');
-  sel.innerHTML = '<option value="">All Models</option>';
-  if(make && MODEL_MAP[make]){
-    MODEL_MAP[make].forEach(m => {
-      const opt = document.createElement('option');
-      opt.value = m; opt.textContent = m;
-      sel.appendChild(opt);
-    });
-  }
-}
-
-function buildFilterParams(){
-  const p = {};
-  const make    = $('f-make').value;
-  const model   = $('f-model').value;
-  const body    = $('f-body').value;
-  const yMin    = $('f-year-min').value;
-  const yMax    = $('f-year-max').value;
-  const pMin    = $('f-price-min').value;
-  const pMax    = $('f-price-max').value;
-  const trans   = $('f-trans').value;
-  const kmMin   = $('f-km-min').value;
-  const kmMax   = $('f-km-max').value;
-
-  if(mileagePreset && mileagePreset !== 'custom') p.mileage_preset = mileagePreset;
-  if(mileagePreset === 'custom'){
-    if(kmMin) p.min_mileage = kmMin;
-    if(kmMax) p.max_mileage = kmMax;
-  }
-  if(yMin)  p.min_year   = yMin;
-  if(yMax)  p.max_year   = yMax;
-  if(pMin)  p.min_price  = pMin;
-  if(pMax)  p.max_price  = pMax;
-  if(trans) p.transmission = trans;
-  if(body)  p.body_type  = body;
-  return p;
-}
-
-function applyFilters(){
-  activeFilters = buildFilterParams();
-  // If make is selected, update the search query
-  const make  = $('f-make').value;
-  const model = $('f-model').value;
-  if(make){
-    const q = model ? `${make} ${model}` : make;
-    $('search-input').value = q;
-    currentQuery = q;
-  }
-  renderChips();
-  // Reset pagination
-  currentPage  = 1;
-  totalLoaded  = 0;
-  loadedUrls   = new Set();
-  allResults   = [];
-  $('grid').innerHTML = '';
-  fetchResults(currentQuery || $('search-input').value.trim(), 1, false, ++reqCounter);
-}
-
-function clearFilters(){
-  activeFilters = {};
-  mileagePreset = '';
-  ['f-make','f-model','f-body','f-trans'].forEach(id => { const el=$(id); if(el) el.value=''; });
-  ['f-year-min','f-year-max','f-price-min','f-price-max','f-km-min','f-km-max'].forEach(id=>{ const el=$(id); if(el) el.value=''; });
-  document.querySelectorAll('.f-preset').forEach(b=>b.classList.remove('active'));
-  $('mileage-custom').style.display = 'none';
-  renderChips();
-  updateFilterBadge(0);
-  // Refresh results without filters
-  if(currentQuery){
-    currentPage=1; totalLoaded=0; loadedUrls=new Set(); allResults=[]; $('grid').innerHTML='';
-    fetchResults(currentQuery, 1, false, ++reqCounter);
-  }
-}
-
-function removeFilter(key){
-  delete activeFilters[key];
-  // Also clear UI
-  const map = { min_price:'f-price-min', max_price:'f-price-max', min_year:'f-year-min', max_year:'f-year-max', transmission:'f-trans', body_type:'f-body', min_mileage:'f-km-min', max_mileage:'f-km-max' };
-  if(map[key]){ const el=$(map[key]); if(el) el.value=''; }
-  if(key === 'mileage_preset'){
-    mileagePreset='';
-    document.querySelectorAll('.f-preset').forEach(b=>b.classList.remove('active'));
-  }
-  renderChips();
-  currentPage=1; totalLoaded=0; loadedUrls=new Set(); allResults=[]; $('grid').innerHTML='';
-  fetchResults(currentQuery, 1, false, ++reqCounter);
-}
-
-const CHIP_LABELS = {
-  mileage_preset: v => ({ zero:'0 km only', under_1000:'< 1,000 km', under_100000:'< 100,000 km' }[v] || v),
-  min_price:  v => `Min ${Number(v).toLocaleString()} EGP`,
-  max_price:  v => `Max ${Number(v).toLocaleString()} EGP`,
-  min_year:   v => `From ${v}`,
-  max_year:   v => `To ${v}`,
-  transmission: v => v,
-  body_type:  v => v,
-  min_mileage: v => `Min ${Number(v).toLocaleString()} km`,
-  max_mileage: v => `Max ${Number(v).toLocaleString()} km`,
-};
-
-function renderChips(){
-  const row = $('chips-row');
-  row.innerHTML = '';
-  let count = 0;
-  Object.entries(activeFilters).forEach(([key, val]) => {
-    if(!val) return;
-    count++;
-    const chip = document.createElement('div');
-    chip.className = 'chip';
-    const labelFn = CHIP_LABELS[key];
-    chip.innerHTML = `${labelFn ? labelFn(val) : `${key}: ${val}`} <button class="chip-x" title="Remove filter" aria-label="Remove ${key} filter">✕</button>`;
-    chip.querySelector('.chip-x').addEventListener('click', () => removeFilter(key));
-    row.appendChild(chip);
-  });
-  updateFilterBadge(count);
-}
-
-function updateFilterBadge(count){
-  const badge = $('filter-badge');
-  if(count > 0){ badge.textContent = count; badge.style.display='inline-flex'; }
-  else          { badge.style.display='none'; }
-}
-
-/* ─────────────────────────────────────────────────────────────────────────── */
 /*  SEARCH                                                                     */
 /* ─────────────────────────────────────────────────────────────────────────── */
 function initiateSearch(queryText, inheritedReq=null){
@@ -930,7 +660,6 @@ function buildSearchURL(query, page){
   const url = new URL('/api/search', window.location.origin);
   url.searchParams.set('q', query);
   url.searchParams.set('page', page);
-  Object.entries(activeFilters).forEach(([k,v]) => { if(v) url.searchParams.set(k, v); });
   return url.toString();
 }
 
@@ -963,8 +692,7 @@ async function fetchResults(query, page, append, myReq){
     if(!data.results || data.results.length === 0){
       if(!append){
         vis(hdrRow,false); grid.innerHTML=''; vis(loadWrap,false);
-        const filterNote = Object.keys(activeFilters).length ? ' with the current filters' : '';
-        empty.textContent = `No listings found for "${query}"${filterNote}. Try adjusting your search or filters.`;
+        empty.textContent = `No listings found for "${query}". Try adjusting your search.`;
         empty.style.display = 'block';
       } else {
         vis(loadWrap,false);
@@ -1252,9 +980,6 @@ async function downloadPDF(){
 async function buildPDFArea(){
   const pdfArea   = $('pdf-area');
   const now       = new Date().toLocaleString('en-GB',{dateStyle:'long',timeStyle:'short'});
-  const filterDesc = Object.entries(activeFilters).map(([k,v])=>{
-    const fn = CHIP_LABELS[k]; return fn ? fn(v) : `${k}: ${v}`;
-  }).join(' · ') || 'None';
 
   let analysisHtml = '';
   if(lastAnalysis){
@@ -1304,7 +1029,7 @@ async function buildPDFArea(){
           <div class="pdf-card-name">${esc(r.name)}</div>
           <div class="pdf-card-specs">${[r.year,r.transmission,mileText,r.location,r.fuel_type].filter(Boolean).join(' · ')}</div>
           <div class="pdf-card-price">Listed: ${priceText}</div>
-          ${estText && estLabel ? `<div class="pdf-card-est">${estLabel}: ${estText}</div>` : ''}
+          ${estText && estLabel ? `<div class="pdf-card-est">${estLabel}:${estText}</div>` : ''}
           ${r.item_url ? `<div class="pdf-card-link"><a href="${r.item_url}" style="color:#0ea5e9">${r.item_url}</a></div>` : '<div class="pdf-card-link" style="color:#94a3b8">Link unavailable</div>'}
         </div>
       </div>`;
@@ -1316,7 +1041,7 @@ async function buildPDFArea(){
       <div class="pdf-date">Generated: ${now}</div>
     </div>
     ${analysisHtml}
-    <div class="pdf-filters"><strong>Search:</strong> ${esc(currentQuery)} &nbsp;|&nbsp; <strong>Filters:</strong> ${filterDesc} &nbsp;|&nbsp; <strong>Listings shown:</strong> ${allResults.length}</div>
+    <div class="pdf-filters"><strong>Search:</strong> ${esc(currentQuery)} &nbsp;|&nbsp; <strong>Listings shown:</strong> ${allResults.length}</div>
     ${statsHtml}
     <div class="pdf-grid">${cardsHtml}</div>
     <div class="pdf-disclaimer">
@@ -1561,19 +1286,19 @@ function renderVIRContent(data){
         </div>
         <div class="vir-spec-item">
           <div class="vir-spec-label">0–100 km/h</div>
-          <div class="vir-spec-val">${sv(v.acceleration_0_100) !== '—' ? sv(v.acceleration_0_100) + 's' : '—'} ${tag(v.acceleration_0_100)}</div>
+          <div class="vir-spec-val">${sv(v.acceleration_0_100) !== '—' ? sv(v.acceleration_0_100)+'s' : '—'} ${tag(v.acceleration_0_100)}</div>
         </div>
         <div class="vir-spec-item">
           <div class="vir-spec-label">Top Speed</div>
-          <div class="vir-spec-val">${sv(v.top_speed_kmh) !== '—' ? sv(v.top_speed_kmh) + ' km/h' : '—'} ${tag(v.top_speed_kmh)}</div>
+          <div class="vir-spec-val">${sv(v.top_speed_kmh) !== '—' ? sv(v.top_speed_kmh)+' km/h' : '—'} ${tag(v.top_speed_kmh)}</div>
         </div>
         <div class="vir-spec-item">
           <div class="vir-spec-label">Fuel Economy</div>
-          <div class="vir-spec-val">${sv(v.fuel_economy_l100km) !== '—' ? sv(v.fuel_economy_l100km) + ' L/100km' : '—'} ${tag(v.fuel_economy_l100km)}</div>
+          <div class="vir-spec-val">${sv(v.fuel_economy_l100km) !== '—' ? sv(v.fuel_economy_l100km)+' L/100km' : '—'} ${tag(v.fuel_economy_l100km)}</div>
         </div>
         <div class="vir-spec-item">
           <div class="vir-spec-label">Tank</div>
-          <div class="vir-spec-val">${sv(v.tank_l) !== '—' ? sv(v.tank_l) + ' L' : '—'} ${tag(v.tank_l)}</div>
+          <div class="vir-spec-val">${sv(v.tank_l) !== '—' ? sv(v.tank_l)+' L' : '—'} ${tag(v.tank_l)}</div>
         </div>
       </div>`;
   }
