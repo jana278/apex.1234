@@ -44,12 +44,11 @@ import sys
 sys.modules['__main__'].ApexProductionValuationEngine = ApexProductionValuationEngine
 
 try:
-    from catboost import Pool, CatBoostRegressor
+    from catboost import Pool
     HAS_CATBOOST = True
 except ImportError:
     HAS_CATBOOST = False
     Pool = None
-    CatBoostRegressor = None
 
 # ─── UI & CSS Setup (Exact HTML/CSS from index.html) ──────────────────────────
 @st.cache_data(show_spinner=False)
@@ -159,9 +158,7 @@ html, body, [data-testid="stAppViewContainer"] {{
 .price-area {{ display: flex; justify-content: space-between; align-items: flex-end; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.07); margin-top: auto; }}
 .price-label {{ color: var(--muted); font-size: .71rem; display: block; margin-bottom: 2px; }}
 .price-val {{ color: #fff; font-size: 1.1rem; font-weight: 800; }}
-.price-val.missing {{ color: var(--muted); font-size: .82rem; font-weight: 500; }}
 .est-val {{ color: var(--blue); font-size: .98rem; font-weight: 700; }}
-.est-val.na {{ color: #475569; font-size: .78rem; font-weight: 500; }}
 
 .view-btn {{
     display: block; width: 100%; text-align: center; background: var(--blue-dim);
@@ -171,6 +168,8 @@ html, body, [data-testid="stAppViewContainer"] {{
 .view-btn:hover {{ background: rgba(56,189,248,.28); box-shadow: 0 0 14px rgba(56,189,248,.32); color: #fff; }}
 </style>
 """, unsafe_allow_html=True)
+
+st.markdown('<div class="background-car"></div>', unsafe_allow_html=True)
 
 st.markdown("""
 <div class="hero">
@@ -186,6 +185,7 @@ st.markdown("""
     <div class="feat-item"><div class="feat-icon">▥</div><div class="feat-title">Smart Results</div><div class="feat-desc">Best matches for you</div></div>
 </div>
 """, unsafe_allow_html=True)
+
 
 # ─── AI Loaders (Vision & CatBoost) ──────────────────────────────────────────
 VISION_MODEL = "dima806/car_models_image_detection"
@@ -353,7 +353,6 @@ BRAND_RENAME = {"mercedes-benz": "mercedes", "vw": "volkswagen", "chevy": "chevr
 def classify_car_image(image_input) -> str:
     if car_vision_model is None or img_processor is None: return ""
     try:
-        import io
         if isinstance(image_input, bytes):
             image = Image.open(io.BytesIO(image_input)).convert("RGB")
         else:
@@ -621,34 +620,36 @@ if submitted or user_query or uploaded_file:
             img_html = f'<img class="gallery-img" src="{r.get("image_url")}" onerror="this.style.display=\'none\'">' if r.get("image_url") else '<div class="no-photo">Photo unavailable</div>'
             link = r.get("item_url", "#")
             
-            card_html = f"""<div class="card">
-<div class="gallery">{img_html}</div>
-<div class="card-body">
-<div class="card-title-row">
-<h2 class="card-title">{r['name']}</h2>
-<span class="badge {badge_class}">{badge_text}</span>
-</div>
-<div class="specs">
-<span>📅 {r.get('year', '')}</span>
-<span>⚙️ {r.get('transmission', 'Auto')}</span>
-<span>🛣️ {km_text}</span>
-<span>📍 {r.get('location', '')}</span>
-<span>⚡ Match: {r.get('match_score', '')}%</span>
-<span>🏷️ {r.get('condition_tag', '')}</span>
-</div>
-<div class="price-area">
-<div>
-<span class="price-label">Listed Price</span>
-<span class="price-val">{price_text}</span>
-</div>
-<div style="text-align:right">
-<span class="price-label">Fair Price (CatBoost AI)</span>
-<span class="est-val">{fair_text}</span>
-</div>
-</div>
-<a href="{link}" target="_blank" rel="noopener noreferrer" class="view-btn">View on {r.get('source', 'Marketplace')} ↗</a>
-</div>
-</div>"""
+            card_html = f"""
+            <div class="card">
+                <div class="gallery">{img_html}</div>
+                <div class="card-body">
+                    <div class="card-title-row">
+                        <h2 class="card-title">{r['name']}</h2>
+                        <span class="badge {badge_class}">{badge_text}</span>
+                    </div>
+                    <div class="specs">
+                        <span>📅 {r.get('year', '')}</span>
+                        <span>⚙️ {r.get('transmission', 'Auto')}</span>
+                        <span>🛣️ {km_text}</span>
+                        <span>📍 {r.get('location', '')}</span>
+                        <span>⚡ Match: {r.get('match_score', '')}%</span>
+                        <span>🏷️ {r.get('condition_tag', '')}</span>
+                    </div>
+                    <div class="price-area">
+                        <div>
+                            <span class="price-label">Listed Price</span>
+                            <span class="price-val">{price_text}</span>
+                        </div>
+                        <div style="text-align:right">
+                            <span class="price-label">Fair Price (CatBoost AI)</span>
+                            <span class="est-val">{fair_text}</span>
+                        </div>
+                    </div>
+                    <a href="{link}" target="_blank" rel="noopener noreferrer" class="view-btn">View on {r.get('source', 'Marketplace')} ↗</a>
+                </div>
+            </div>
+            """
             html_cards += card_html
             
         st.markdown(f'<div class="grid">{html_cards}</div>', unsafe_allow_html=True)
