@@ -113,33 +113,34 @@ html, body, [data-testid="stAppViewContainer"] {{
                 linear-gradient(180deg,rgba(3,7,18,.35) 0%,rgba(3,7,18,.15) 46%,rgba(3,7,18,.92) 100%);
 }}
 
-.main .block-container {{ position: relative; z-index: 2; max-width: 1240px; padding: 2.5rem 1.25rem 5rem; }}
+.main .block-container {{ position: relative; z-index: 2; max-width: 1240px; padding: 0.5rem 1.25rem 5rem !important; }}
 #MainMenu, header, footer {{visibility: hidden !important; display: none !important;}}
 
-/* --- HERO SECTION --- */
-.hero {{ text-align: center !important; margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: center; }}
-.hero-pill {{ display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 16px; margin: 0 auto 14px auto; border: 1px solid rgba(56,189,248,.28); border-radius: 999px; background: rgba(15,23,42,.72); color: #e2e8f0; font-size: .72rem; font-weight: 800; letter-spacing: 2px; backdrop-filter: blur(10px); }}
-.hero h1 {{ color: #fff; font-size: clamp(3.2rem, 6vw, 4.8rem); font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin: 0; text-align: center !important; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }}
+/* --- COMPACT HERO SECTION (Pushed Up & Exact Vercel Spacing) --- */
+.hero {{ text-align: center !important; margin-bottom: 0.5rem !important; display: flex; flex-direction: column; align-items: center; padding-top: 0px !important; }}
+.hero-pill {{ display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 4px 14px; margin: 0 auto 8px auto !important; border: 1px solid rgba(56,189,248,.28); border-radius: 999px; background: rgba(15,23,42,.72); color: #e2e8f0; font-size: .7rem; font-weight: 800; letter-spacing: 2px; backdrop-filter: blur(10px); }}
+.hero h1 {{ color: #fff; font-size: clamp(2.8rem, 5vw, 4.2rem); font-weight: 800; letter-spacing: -2px; line-height: 1.05; margin: 0; text-align: center !important; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }}
+.apex-white {{ color: #ffffff !important; }}
 .hero h1 span {{ color: var(--blue); text-shadow: 0 0 30px rgba(56,189,248,.5); }}
-.hero-line {{ width: 54px; height: 3px; background: var(--blue); border-radius: 99px; margin: 14px auto 0 auto; box-shadow: 0 0 20px var(--blue-glow); }}
-.hero-sub {{ color: #d1d5db !important; font-size: 1rem !important; max-width: 660px; margin: 16px auto 25px auto !important; line-height: 1.6; text-align: center !important; text-shadow: 0 2px 10px rgba(0,0,0,0.8); display: block; }}
+.hero-line {{ width: 50px; height: 3px; background: var(--blue); border-radius: 99px; margin: 6px auto 0 auto !important; box-shadow: 0 0 20px var(--blue-glow); }}
+.hero-sub {{ color: #d1d5db !important; font-size: 0.95rem !important; max-width: 620px; margin: 8px auto 14px auto !important; line-height: 1.4; text-align: center !important; text-shadow: 0 2px 10px rgba(0,0,0,0.8); display: block; }}
 
 /* Feature Row - 4 Items */
-.feat-row {{ display: flex; justify-content: center; max-width: 780px; margin: 0 auto 30px auto; }}
-.feat-item {{ text-align: center; padding: 5px 20px; border-right: 1px solid rgba(255,255,255,.12); }}
+.feat-row {{ display: flex; justify-content: center; max-width: 750px; margin: 0 auto 15px auto !important; }}
+.feat-item {{ text-align: center; padding: 4px 18px; border-right: 1px solid rgba(255,255,255,.12); }}
 .feat-item:last-child {{ border-right: none; }}
-.feat-icon {{ color: var(--blue); font-size: 1rem; margin-bottom: 3px; }}
-.feat-title {{ color: #fff; font-size: .8rem; font-weight: 700; }}
-.feat-desc {{ color: #9ca3af; font-size: .65rem; margin-top: 2px; }}
+.feat-icon {{ color: var(--blue); font-size: 0.95rem; margin-bottom: 2px; }}
+.feat-title {{ color: #fff; font-size: .75rem; font-weight: 700; }}
+.feat-desc {{ color: #9ca3af; font-size: .6rem; margin-top: 1px; }}
 
 /* --- SEARCH CAPSULE --- */
 [data-testid="stForm"] {{
     background: rgba(10, 13, 20, 0.75) !important;
     border: 1.2px solid rgba(56, 189, 248, 0.4) !important;
     border-radius: 999px !important;
-    padding: 6px 16px !important;
+    padding: 4px 14px !important;
     max-width: 820px;
-    margin: 0 auto 10px auto !important;
+    margin: 0 auto 6px auto !important;
     backdrop-filter: blur(14px);
     box-shadow: 0 16px 40px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,.2);
 }}
@@ -155,7 +156,7 @@ div[data-testid="stTextInput"] div[data-baseweb="input"] {{
     border: none !important;
     box-shadow: none !important;
 }}
-div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.05rem; padding-left: 5px; }}
+div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.02rem; padding-left: 5px; }}
 
 /* File Uploader Camera Icon Inside Pill */
 div[data-testid="stFileUploader"] label {{ display: none; }}
@@ -163,9 +164,9 @@ div[data-testid="stFileUploader"] section {{
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    min-height: 38px !important;
-    height: 38px !important;
-    width: 38px !important;
+    min-height: 36px !important;
+    height: 36px !important;
+    width: 36px !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -175,7 +176,7 @@ div[data-testid="stFileUploader"] section {{
 }}
 div[data-testid="stFileUploader"] section::after {{
     content: '📷';
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     position: absolute;
     pointer-events: none;
     opacity: 0.8;
@@ -199,7 +200,7 @@ div[data-testid="stFormSubmitButton"] button {{
     color: #fff !important;
     border-radius: 999px !important;
     font-weight: 700 !important;
-    height: 42px !important;
+    height: 40px !important;
     margin: 0 !important;
     width: 100% !important;
     font-size: .95rem;
@@ -207,8 +208,8 @@ div[data-testid="stFormSubmitButton"] button {{
 }}
 div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.4) !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important; }}
 
-/* Helper Text Bottom */
-.search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 15px; margin-bottom: 40px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
+/* Helper Text Bottom & Pushed Margin */
+.search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.82rem; margin-top: 10px; margin-bottom: 60px !important; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
 
 /* Load More Button Styling */
 div[data-testid="stButton"] button {{ background: rgba(56,189,248,.08) !important; border: 1px dashed rgba(56,189,248,.4) !important; color: #38bdf8 !important; border-radius: 99px !important; font-weight: 700 !important; transition: all .2s !important; padding: 10px 24px !important; width: 100% !important; margin-top: 20px !important; }}
@@ -250,7 +251,7 @@ st.markdown('<div class="background-car"></div>', unsafe_allow_html=True)
 st.markdown("""
 <div class="hero">
     <div class="hero-pill">✦ SMART CAR MARKET</div>
-    <h1>Apex <span>Motors</span></h1>
+    <h1><span class="apex-white">Apex</span> <span>Motors</span></h1>
     <div class="hero-line"></div>
     <span class="hero-sub">Find the right car, get expert insights, and make smarter decisions with the power of AI.</span>
 </div>
