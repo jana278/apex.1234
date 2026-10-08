@@ -23,18 +23,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. PyTorch & Transformers (LOCAL Vision Engine - No APIs)
-try:
-    import torch
-    # Optimize threads to prevent Streamlit RAM crash
-    torch.set_num_threads(1)
-    from transformers import AutoImageProcessor, AutoModelForImageClassification
-    HAS_TORCH = True
-except ImportError:
-    HAS_TORCH = False
-    torch = None
-
-# 3. CatBoost (Valuation Engine)
+# 2. CatBoost (Valuation Engine)
 class ApexProductionValuationEngine:
     def __init__(self, model, num_cols, cat_cols, medians):
         self.model = model
@@ -45,23 +34,18 @@ class ApexProductionValuationEngine:
 import sys
 sys.modules['__main__'].ApexProductionValuationEngine = ApexProductionValuationEngine
 
-try:
-    from catboost import Pool
-    HAS_CATBOOST = True
-except ImportError:
-    HAS_CATBOOST = False
-    Pool = None
-
 @st.cache_resource(show_spinner=False)
 def load_catboost():
-    model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "apex_catboost_valuation.joblib")
-    if not os.path.exists(model_path): model_path = "apex_catboost_valuation.joblib"
-    if os.path.exists(model_path):
-        try: return joblib.load(model_path)
-        except Exception: pass
-    return None
+    try:
+        from catboost import Pool
+        model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "apex_catboost_valuation.joblib")
+        if not os.path.exists(model_path): model_path = "apex_catboost_valuation.joblib"
+        if os.path.exists(model_path):
+            return joblib.load(model_path), Pool
+    except Exception: pass
+    return None, None
 
-full_pricing_pipeline = load_catboost()
+full_pricing_pipeline, CB_Pool = load_catboost()
 
 # ─── UI & CSS Setup ────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
@@ -185,22 +169,49 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─── Load Local PyTorch Vision Engine ────────────────────────────────────────
-VISION_MODEL = "dima806/car_models_image_detection"
+# ─── Load Vision API (Fast & Clean) ──────────────────────────────────────────
+KNOWN_MULTIWORD_BRANDS = ["alfa romeo", "land rover", "aston martin", "mercedes benz", "rolls royce"]
+BRAND_RENAME = {"mercedes-benz": "mercedes", "vw": "volkswagen", "chevy": "chevrolet", "alfa-romeo": "alfa romeo"}
 
-@st.cache_resource(show_spinner=False)
-def load_vision_model():
-    if not HAS_TORCH: return None, None
+def classify_car_image_api(image_bytes) -> str:
+    hf_token = os.environ.get("HF_TOKEN")
     try:
-        proc = AutoImageProcessor.from_pretrained(VISION_MODEL)
-        mod = AutoModelForImageClassification.from_pretrained(VISION_MODEL)
-        mod.eval()
-        return proc, mod
-    except Exception as e:
-        print("PyTorch Load Error:", e)
-        return None, None
+        if "HF_TOKEN" in st.secrets: hf_token = st.secrets["HF_TOKEN"]
+    except: pass
 
-img_processor, car_vision_model = load_vision_model()
+    headers = {"Authorization": f"Bearer {hf_token}"} if hf_token else {}
+    api_url = "https://api-inference.huggingface.co/models/dima806/car_models_image_detection"
+
+    try:
+        resp = requests.post(api_url, headers=headers, data=image_bytes, timeout=15)
+        if resp.status_code == 200:
+            data = resp.json()
+            if isinstance(data, list) and len(data) > 0:
+                raw_label = data[0].get("label", "").lower().replace("_", " ").strip()
+                all_labels = " ".join([d.get("label", "").lower().replace("_", " ") for d in data])
+                
+                if any(k in all_labels for k in ["subaru brz", "toyota gr86", "toyota gt86", "toyota 86"]):
+                    for c in data:
+                        lbl = c.get("label","").lower().replace("_", " ")
+                        if any(k in lbl for k in ["subaru brz", "toyota gr86", "toyota gt86", "toyota 86"]):
+                            raw_label = lbl; break
+
+                clean_model = re.sub(r"\b(class|series|sedan|suv|coupe)\b", "", raw_label, flags=re.IGNORECASE).strip()
+                
+                for mb in KNOWN_MULTIWORD_BRANDS:
+                    if clean_model.startswith(mb):
+                        b = BRAND_RENAME.get(mb, mb)
+                        m = clean_model[len(mb):].strip()
+                        return f"{b} {m}".strip()
+                
+                tokens = clean_model.split()
+                brand = BRAND_RENAME.get(tokens[0], tokens[0])
+                model = " ".join(tokens[1:]) if len(tokens) > 1 else ""
+                return f"{brand} {model}".strip()
+    except Exception as e:
+        print("HF API Exception:", e)
+
+    return ""
 
 # ─── NLP Dictionary & Utilities ──────────────────────────────────────────────
 ARABIC_TO_ENG_BRAND = {
@@ -300,51 +311,6 @@ def parse_search_query(user_query: str):
 
     return detected_brand, detected_model, detected_location, min_p, max_p
 
-# ─── Pure Local PyTorch Engine ──────────────────────────────────────────────
-KNOWN_MULTIWORD_BRANDS = ["alfa romeo", "land rover", "aston martin", "mercedes benz", "rolls royce"]
-BRAND_RENAME = {"mercedes-benz": "mercedes", "vw": "volkswagen", "chevy": "chevrolet", "alfa-romeo": "alfa romeo"}
-
-def classify_car_image(image_bytes) -> str:
-    if not HAS_TORCH or car_vision_model is None or img_processor is None:
-        return ""
-    try:
-        image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        inputs = img_processor(images=image, return_tensors="pt")
-        
-        with torch.no_grad():
-            logits = car_vision_model(**inputs).logits
-            probs = torch.nn.functional.softmax(logits, dim=-1)[0]
-            
-        top_probs, top_indices = torch.topk(probs, k=5)
-        
-        candidates = []
-        for p, idx in zip(top_probs, top_indices):
-            raw_label = car_vision_model.config.id2label[idx.item()].replace("_", " ").strip().lower()
-            candidates.append(raw_label)
-            
-        if candidates:
-            sel_model = candidates[0]
-            if any(k in " ".join(candidates) for k in ["subaru brz", "toyota gr86", "toyota gt86", "toyota 86"]):
-                for c in candidates:
-                    if any(k in c for k in ["subaru brz", "toyota gr86", "toyota gt86", "toyota 86"]):
-                        sel_model = c; break
-            
-            clean_model = re.sub(r"\b(class|series|sedan|suv|coupe)\b", "", sel_model, flags=re.IGNORECASE).strip()
-            
-            for mb in KNOWN_MULTIWORD_BRANDS:
-                if clean_model.startswith(mb):
-                    b = BRAND_RENAME.get(mb, mb)
-                    m = clean_model[len(mb):].strip()
-                    return f"{b} {m}".strip()
-            
-            tokens = clean_model.split()
-            brand = BRAND_RENAME.get(tokens[0], tokens[0])
-            model = " ".join(tokens[1:]) if len(tokens) > 1 else ""
-            return f"{brand} {model}".strip()
-    except Exception as e:
-        print("Local PyTorch Vision Error:", e)
-    return ""
-
 # ─── Robust Scraper Engine (With Proxy Bypass for Streamlit Cloud) ─────────
 class MarketScraper:
     def __init__(self):
@@ -402,9 +368,7 @@ class MarketScraper:
                             href = a["href"].strip()
                             if re.search(r'/(?:car|new-car)/[^\?#]*?\d{5,}$', href, re.IGNORECASE) and "teraz/" not in href.lower():
                                 detail_a = a
-                                title_text = a.get_text(strip=True)
-                                if title_text and not any(k in title_text.lower() for k in ["slide","previous","next","عرض الكل"]):
-                                    break
+                                break
                         if not detail_a: continue
                         
                         full_link = f"https://eg.hatla2ee.com{detail_a['href']}" if detail_a['href'].startswith('/') else detail_a['href']
@@ -443,9 +407,12 @@ class MarketScraper:
                         for k, v in LOCATION_MAP.items():
                             if k in card_text_space.lower():
                                 loc_name = v; break
+                        
+                        # 100% English Title Generator
+                        clean_title = f"{brand.title()} {model.title() if model else ''} {year or ''}".strip()
                                 
                         records.append({
-                            "name": title_text or f"{brand.title()} {model.title() if model else ''} {year or ''}".strip(), 
+                            "name": clean_title, 
                             "brand": brand.title(), "model": model.title() if model else "Model",
                             "price": price, "year": year if year else 2024, "mileage": mileage, 
                             "location": loc_name, 
@@ -492,9 +459,11 @@ class MarketScraper:
                     img_url = ""
                     images = item.get("images", [])
                     if images: img_url = images[0].get("url", "")
+                    
+                    clean_title = f"{brand.title()} {model.title() if model else ''} {year or ''}".strip()
 
                     records.append({
-                        "name": title, "brand": brand.title(), "model": model.title() if model else "Model",
+                        "name": clean_title, "brand": brand.title(), "model": model.title() if model else "Model",
                         "price": float(price_val), "year": year, "mileage": 35000.0,
                         "location": loc_name, "transmission": "Automatic",
                         "condition_tag": "Factory Paint" if any(k in title for k in ["فابريك", "فبريك", "وكالة", "زيرو", "factory paint"]) else "Normal",
@@ -518,7 +487,7 @@ def run_hybrid_search(user_query, uploaded_file):
     detected_car = ""
     if uploaded_file:
         try:
-            detected_car = classify_car_image(uploaded_file.getvalue())
+            detected_car = classify_car_image_api(uploaded_file.getvalue())
         except Exception as e: print("Vision Failed:", e)
     
     combined_query = f"{detected_car} {user_query}".strip()
@@ -556,7 +525,13 @@ def run_hybrid_search(user_query, uploaded_file):
         df = df.sort_values("price_dist", ascending=True)
         
     predicted = []
-    if full_pricing_pipeline is not None and HAS_CATBOOST and Pool is not None:
+    
+    # Safely Extract CatBoost Model
+    catboost_actual_model = None
+    if full_pricing_pipeline is not None and HAS_CATBOOST and CB_Pool is not None:
+        catboost_actual_model = getattr(full_pricing_pipeline, 'model', full_pricing_pipeline)
+        
+    if catboost_actual_model is not None:
         try:
             eval_df = df.copy()
             num_cols = ["year", "mileage", "car_age", "km_per_year"]
@@ -568,14 +543,19 @@ def run_hybrid_search(user_query, uploaded_file):
             eval_df['km_per_year'] = np.where(eval_df['car_age'] > 0, eval_df['mileage'] / eval_df['car_age'].replace(0, 1), eval_df['mileage'])
             for c in cat_cols: eval_df[c] = eval_df.get(c, "Missing").fillna("Missing").astype(str).str.title()
             
-            pool = Pool(eval_df[num_cols + cat_cols], cat_features=cat_cols)
-            preds_log = full_pricing_pipeline.model.predict(pool)
-            preds_egp = np.expm1(preds_log)
+            pool = CB_Pool(eval_df[num_cols + cat_cols], cat_features=cat_cols)
+            preds_log = catboost_actual_model.predict(pool)
+            
+            # Convert prediction safely back to EGP
+            preds_egp = np.expm1(preds_log) if np.mean(preds_log) < 30 else preds_log
             predicted = [float(np.round(p, 0)) if p > 0 else None for p in preds_egp]
         except Exception as e: 
             print("Valuation error:", e)
-            predicted = [None] * len(df)
-    else:
+            predicted = []
+            
+    # AI Fallback calculation if CatBoost failed
+    if not predicted or len(predicted) != len(df):
+        predicted = []
         for _, r in df.iterrows():
             base = {"mercedes":3000000,"bmw":2900000,"audi":2800000,"kia":1800000,"hyundai":1700000,"toyota":1750000}.get(str(r.get("brand")).lower(), 1500000)
             age = max(0, 2026 - int(r.get("year", 2024)))
@@ -618,7 +598,7 @@ if submitted or user_query or uploaded_file:
     st.markdown(f'<div style="color:#fff; font-size:1.15rem; font-weight:700; margin:35px auto 15px; max-width:1200px;">🎯 Live Market Results for: "{final_q}"</div>', unsafe_allow_html=True)
     
     if df_res.empty:
-        st.info("No matching vehicle listings found for your search criteria. (If using strict filters like year or location, try removing them)")
+        st.info("No matching vehicle listings found for your search criteria.")
     else:
         html_cards = ""
         for _, r in df_res.iterrows():
@@ -645,6 +625,7 @@ if submitted or user_query or uploaded_file:
             img_html = f'<img class="gallery-img" src="{r.get("image_url")}" onerror="this.style.display=\'none\'">' if r.get("image_url") else '<div class="no-photo">Photo unavailable</div>'
             link = r.get("item_url", "#")
             
+            # NO INDENTATION BELOW TO PREVENT STREAMLIT FROM PARSING AS CODE BLOCK!
             card_html = f"""<div class="card">
 <div class="gallery">{img_html}</div>
 <div class="card-body">
