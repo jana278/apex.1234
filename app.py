@@ -133,43 +133,61 @@ html, body, [data-testid="stAppViewContainer"] {{
 .feat-title {{ color: #fff; font-size: .8rem; font-weight: 700; }}
 .feat-desc {{ color: #9ca3af; font-size: .65rem; margin-top: 2px; }}
 
-/* --- EXACT VERCEL UNIFIED SEARCH CAPSULE --- */
+/* --- DESTROY STREAMLIT DEFAULT BACKGROUNDS & OVERRIDE VERCEL STYLE --- */
 [data-testid="stForm"] {{
-    background: rgba(10, 13, 20, 0.82) !important;
-    border: 1.5px solid rgba(56, 189, 248, 0.45) !important;
-    border-radius: 999px !important;
-    padding: 4px 6px 4px 18px !important;
-    max-width: 820px;
-    margin: 0 auto 10px auto !important;
-    backdrop-filter: blur(16px);
-    box-shadow: 0 16px 40px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,0.25), 0 0 15px rgba(56,189,248,0.2) !important;
-    display: flex;
-    align-items: center;
-}}
-[data-testid="stForm"] [data-testid="stHorizontalBlock"] {{
-    align-items: center !important;
-    gap: 10px !important;
-    width: 100% !important;
-}}
-
-/* Text Input Inside Capsule */
-div[data-testid="stTextInput"] label {{ display: none; }}
-div[data-testid="stTextInput"] div[data-baseweb="input"] {{
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}}
-div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.05rem; }}
-
-/* File Uploader Camera Icon (Inside Capsule on the Right)[cite: 10] */
-div[data-testid="stFileUploader"] label {{ display: none; }}
-div[data-testid="stFileUploader"] section {{
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    min-height: 38px !important;
-    height: 38px !important;
+    max-width: 820px;
+    margin: 0 auto 10px auto !important;
+}}
+[data-testid="stForm"] [data-testid="stHorizontalBlock"] {{
+    align-items: center !important;
+    gap: 12px !important;
+}}
+
+/* Target Streamlit Text Input BaseWeb container directly to remove default gray background */
+div[data-testid="stTextInput"] label {{ display: none; }}
+div[data-testid="stTextInput"] div[data-baseweb="input"] {{
+    background: rgba(10, 13, 20, 0.85) !important;
+    background-color: rgba(10, 13, 20, 0.85) !important;
+    border: 1.5px solid rgba(56, 189, 248, 0.45) !important;
+    border-radius: 999px !important;
+    padding: 4px 45px 4px 18px !important;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 16px 40px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,0.2) !important;
+    height: 48px !important;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+div[data-testid="stTextInput"] div[data-baseweb="base-input"] {{
+    background-color: transparent !important;
+}}
+div[data-testid="stTextInput"] input {{
+    background-color: transparent !important;
+    color: #fff !important;
+    font-size: 1.05rem !important;
+}}
+
+/* File Uploader Camera Icon (Inside Capsule on the Right) */
+div[data-testid="stFileUploader"] {{
+    position: absolute !important;
+    right: 24% !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10 !important;
     width: 38px !important;
+}}
+div[data-testid="stFileUploader"] label {{ display: none; }}
+div[data-testid="stFileUploader"] section {{
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    min-height: 36px !important;
+    height: 36px !important;
+    width: 36px !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -195,20 +213,20 @@ div[data-testid="stFileUploader"] section button {{
 }}
 div[data-testid="stFileUploader"] > div:nth-child(2) {{ display: none !important; }}
 
-/* Search Button Inside Capsule (Exact Vercel Style)[cite: 10] */
+/* Search Button (Exact Vercel Style) */
 div[data-testid="stFormSubmitButton"] button {{
-    background: rgba(56, 189, 248, 0.18) !important;
+    background: rgba(56, 189, 248, 0.16) !important;
     border: 1px solid #38bdf8 !important;
     color: #fff !important;
     border-radius: 999px !important;
     font-weight: 700 !important;
-    height: 44px !important;
+    height: 48px !important;
     margin: 0 !important;
     width: 100% !important;
     font-size: 0.95rem;
     transition: all .2s;
 }}
-div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.42) !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important; }}
+div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.4) !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important; }}
 
 /* Helper Text Bottom */
 .search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 15px; margin-bottom: 50px !important; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
