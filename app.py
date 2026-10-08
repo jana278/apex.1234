@@ -796,3 +796,4 @@ if not st.session_state.last_results.empty or st.session_state.last_query != "":
                 if st.button("Load More Vehicles ↓", use_container_width=True):
                     st.session_state.show_count += 12
                     st.rerun()
+                    
