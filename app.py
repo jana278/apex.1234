@@ -133,7 +133,7 @@ html, body, [data-testid="stAppViewContainer"] {{
 .feat-title {{ color: #fff; font-size: .8rem; font-weight: 700; }}
 .feat-desc {{ color: #9ca3af; font-size: .65rem; margin-top: 2px; }}
 
-/* --- EXACT VERCEL UNIFIED SEARCH CAPSULE --- */
+/* --- VERCEL EXACT UNIFIED SEARCH CAPSULE --- */
 [data-testid="stForm"] {{
     background: rgba(10, 13, 20, 0.82) !important;
     border: 1.5px solid rgba(56, 189, 248, 0.45) !important;
@@ -156,49 +156,38 @@ html, body, [data-testid="stAppViewContainer"] {{
 div[data-testid="stTextInput"] label {{ display: none; }}
 div[data-testid="stTextInput"] div[data-baseweb="input"] {{
     background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
-}}
-div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.05rem; }}
-
-/* File Uploader Camera Icon (Inside Capsule on the Right)[cite: 10] */
-div[data-testid="stFileUploader"] label {{ display: none; }}
-div[data-testid="stFileUploader"] section {{
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-    min-height: 38px !important;
-    height: 38px !important;
-    width: 38px !important;
+    height: 48px !important;
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
+}
+div[data-testid="stTextInput"] input {{
+    background-color: transparent !important;
+    color: #fff !important;
+    font-size: 1.05rem !important;
 }}
-div[data-testid="stFileUploader"] section::after {{
-    content: '📷';
-    font-size: 1.3rem;
-    position: absolute;
-    pointer-events: none;
-    opacity: 0.85;
-    transition: opacity 0.2s;
-}}
-div[data-testid="stFileUploader"] section:hover::after {{ opacity: 1; }}
-div[data-testid="stFileUploader"] section svg, 
-div[data-testid="stFileUploader"] section div, 
-div[data-testid="stFileUploader"] section span, 
-div[data-testid="stFileUploader"] section small, 
-div[data-testid="stFileUploader"] section button {{
-    display: none !important;
-    opacity: 0 !important;
-}}
-div[data-testid="stFileUploader"] > div:nth-child(2) {{ display: none !important; }}
 
-/* Search Button Inside Capsule (Exact Vercel Style)[cite: 10] */
+/* File Uploader Custom Styling to match Vercel image upload preview */
+div[data-testid="stFileUploader"] {{
+    width: 42px !important;
+}}
+div[data-testid="stFileUploader"] label {{ display: none; }}
+div[data-testid="stFileUploader"] section {{
+    background: rgba(56, 189, 248, 0.1) !important;
+    border: 1px dashed rgba(56, 189, 248, 0.5) !important;
+    border-radius: 8px !important;
+    padding: 4px !important;
+    min-height: 38px !important;
+    cursor: pointer;
+}}
+div[data-testid="stFileUploader"] small {{ color: #94a3b8 !important; font-size: 0.7rem !important; }}
+
+/* Search Button Inside Capsule (Exact Vercel Style) */
 div[data-testid="stFormSubmitButton"] button {{
     background: rgba(56, 189, 248, 0.18) !important;
-    border: 1px solid #38bdf8 !important;
+    border: 1.5px solid #38bdf8 !important;
     color: #fff !important;
     border-radius: 999px !important;
     font-weight: 700 !important;
@@ -209,6 +198,9 @@ div[data-testid="stFormSubmitButton"] button {{
     transition: all .2s;
 }}
 div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.42) !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important; }}
+
+/* Vision Status Banner */
+.vision-status {{ display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--blue); font-size: 0.85rem; font-weight: 600; margin-top: 8px; margin-bottom: 25px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
 
 /* Helper Text Bottom */
 .search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 15px; margin-bottom: 50px !important; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
@@ -711,13 +703,16 @@ def run_hybrid_search(user_query, uploaded_file):
 
 # ─── Streamlit UI Forms & Execution ──────────────────────────────────────────
 with st.form("search_form", clear_on_submit=False):
-    c_in, c_up, c_btn = st.columns([0.68, 0.08, 0.24])
+    c_in, c_up, c_btn = st.columns([0.65, 0.12, 0.23])
     with c_in:
         user_query = st.text_input("Search", placeholder="Try 'Toyota Corolla', 'Kia Sportage 22'...", label_visibility="collapsed")
     with c_up:
         uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
     with c_btn:
         submitted = st.form_submit_button("Search", use_container_width=True)
+
+if uploaded_file is not None:
+    st.markdown('<div class="vision-status">⚡ Analyzing vehicle with AI Vision...</div>', unsafe_allow_html=True)
 
 st.markdown('<div class="search-helper-bottom">Type a car name above and press <b>Enter</b> — e.g. Toyota Corolla, Kia Sportage, Mercedes C180 — or upload a photo to search by image.</div>', unsafe_allow_html=True)
 
