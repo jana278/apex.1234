@@ -113,63 +113,63 @@ html, body, [data-testid="stAppViewContainer"] {{
                 linear-gradient(180deg,rgba(3,7,18,.35) 0%,rgba(3,7,18,.15) 46%,rgba(3,7,18,.92) 100%);
 }}
 
-.main .block-container {{ position: relative; z-index: 2; max-width: 1240px; padding: 0.8rem 1.25rem 5rem !important; }}
+.main .block-container {{ position: relative; z-index: 2; max-width: 1240px; padding: 1.5rem 1.25rem 5rem !important; }}
 #MainMenu, header, footer {{visibility: hidden !important; display: none !important;}}
 
 /* --- HERO SECTION --- */
-.hero {{ text-align: center !important; margin-bottom: 0.8rem !important; display: flex; flex-direction: column; align-items: center; padding-top: 0px !important; }}
-.hero-pill {{ display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 18px; margin: 0 auto 12px auto !important; border: 1.2px solid rgba(56,189,248,.32); border-radius: 999px; background: rgba(15,23,42,.75); color: #e2e8f0; font-size: 0.8rem; font-weight: 800; letter-spacing: 2.5px; backdrop-filter: blur(10px); }}
-.hero h1 {{ color: #fff; font-size: clamp(3.5rem, 6.5vw, 5.2rem); font-weight: 800; letter-spacing: -2.5px; line-height: 1.05; margin: 0; text-align: center !important; text-shadow: 0 4px 25px rgba(0,0,0,0.85); }}
+.hero {{ text-align: center !important; margin-bottom: 1.2rem !important; display: flex; flex-direction: column; align-items: center; padding-top: 0px !important; }}
+.hero-pill {{ display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 16px; margin: 0 auto 12px auto !important; border: 1px solid rgba(56,189,248,.28); border-radius: 999px; background: rgba(15,23,42,.72); color: #e2e8f0; font-size: .72rem; font-weight: 800; letter-spacing: 2px; backdrop-filter: blur(10px); }}
+.hero h1 {{ color: #fff; font-size: clamp(3.2rem, 6vw, 4.8rem); font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin: 0; text-align: center !important; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }}
 .apex-white {{ color: #ffffff !important; }}
-.hero h1 span {{ color: var(--blue); text-shadow: 0 0 35px rgba(56,189,248,.6); }}
-.hero-line {{ width: 60px; height: 3.5px; background: var(--blue); border-radius: 99px; margin: 8px auto 0 auto !important; box-shadow: 0 0 22px var(--blue-glow); }}
-.hero-sub {{ color: #cbd5e1 !important; font-size: 1.1rem !important; max-width: 700px; margin: 12px auto 18px auto !important; line-height: 1.5; text-align: center !important; text-shadow: 0 2px 12px rgba(0,0,0,0.85); display: block; }}
+.hero h1 span {{ color: var(--blue); text-shadow: 0 0 30px rgba(56,189,248,.5); }}
+.hero-line {{ width: 54px; height: 3px; background: var(--blue); border-radius: 99px; margin: 10px auto 0 auto !important; box-shadow: 0 0 20px var(--blue-glow); }}
+.hero-sub {{ color: #d1d5db !important; font-size: 1rem !important; max-width: 660px; margin: 12px auto 20px auto !important; line-height: 1.6; text-align: center !important; text-shadow: 0 2px 10px rgba(0,0,0,0.8); display: block; }}
 
-/* Feature Row - 4 Items */
-.feat-row {{ display: flex; justify-content: center; max-width: 820px; margin: 0 auto 22px auto !important; }}
-.feat-item {{ text-align: center; padding: 6px 22px; border-right: 1px solid rgba(255,255,255,.14); }}
+/* Feature Row - 4 Items Exact Vercel Style */
+.feat-row {{ display: flex; justify-content: center; max-width: 780px; margin: 0 auto 25px auto !important; }}
+.feat-item {{ text-align: center; padding: 5px 22px; border-right: 1px solid rgba(255,255,255,.12); }}
 .feat-item:last-child {{ border-right: none; }}
-.feat-icon {{ color: var(--blue); font-size: 1.1rem; margin-bottom: 4px; }}
-.feat-title {{ color: #fff; font-size: 0.88rem; font-weight: 700; }}
-.feat-desc {{ color: #94a3b8; font-size: 0.73rem; margin-top: 2px; }}
+.feat-icon {{ color: var(--blue); font-size: 1rem; margin-bottom: 3px; }}
+.feat-title {{ color: #fff; font-size: .8rem; font-weight: 700; }}
+.feat-desc {{ color: #9ca3af; font-size: .65rem; margin-top: 2px; }}
 
-/* --- SEARCH CAPSULE & BUTTON CONTAINER --- */
+/* --- VERCEL EXACT OVAL CAPSULE & BUTTON CONTAINER --- */
 [data-testid="stForm"] {{
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    max-width: 880px;
-    margin: 0 auto 8px auto !important;
+    max-width: 820px;
+    margin: 0 auto 10px auto !important;
 }}
 [data-testid="stForm"] [data-testid="stHorizontalBlock"] {{
     align-items: center !important;
     gap: 12px !important;
 }}
 
-/* The Search Input Capsule (Compact & Logical) */
+/* The Oval Search Capsule Background & Border */
 div[data-testid="stTextInput"] label {{ display: none; }}
 div[data-testid="stTextInput"] div[data-baseweb="input"] {{
-    background: rgba(10, 13, 20, 0.78) !important;
-    border: 1.3px solid rgba(56, 189, 248, 0.45) !important;
+    background: rgba(10, 13, 20, 0.85) !important;
+    border: 1.2px solid rgba(56, 189, 248, 0.45) !important;
     border-radius: 999px !important;
-    padding: 4px 14px 4px 16px !important;
+    padding: 6px 16px 6px 18px !important;
     backdrop-filter: blur(14px);
-    box-shadow: 0 18px 45px rgba(0,0,0,.78), inset 0 1px 0 rgba(56,189,248,.22);
-    height: 48px !important;
+    box-shadow: 0 16px 40px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,0.2);
+    height: 50px !important;
     display: flex;
     align-items: center;
 }}
 div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.05rem; }}
 
-/* File Uploader Camera Icon (Extreme Right Inside Capsule) */
+/* File Uploader Camera Icon (Inside Capsule on the Right) */
 div[data-testid="stFileUploader"] label {{ display: none; }}
 div[data-testid="stFileUploader"] section {{
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    min-height: 38px !important;
-    height: 38px !important;
-    width: 38px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    width: 40px !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -181,9 +181,9 @@ div[data-testid="stFileUploader"] section::after {{
     content: '📷';
     font-size: 1.35rem;
     position: absolute;
-    right: 6px;
+    right: 4px;
     pointer-events: none;
-    opacity: 0.85;
+    opacity: 0.8;
     transition: opacity 0.2s;
 }}
 div[data-testid="stFileUploader"] section:hover::after {{ opacity: 1; }}
@@ -197,23 +197,23 @@ div[data-testid="stFileUploader"] section button {{
 }}
 div[data-testid="stFileUploader"] > div:nth-child(2) {{ display: none !important; }}
 
-/* Search Button Outside (Side by Side) */
+/* Search Button (Outside Capsule, Exact Vercel Style) */
 div[data-testid="stFormSubmitButton"] button {{
-    background: rgba(56, 189, 248, 0.18) !important;
+    background: rgba(56, 189, 248, 0.16) !important;
     border: 1px solid #38bdf8 !important;
     color: #fff !important;
     border-radius: 999px !important;
     font-weight: 700 !important;
-    height: 48px !important;
+    height: 50px !important;
     margin: 0 !important;
     width: 100% !important;
     font-size: 1rem;
     transition: all .2s;
 }}
-div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.42) !important; box-shadow: 0 0 16px rgba(56, 189, 248, 0.45) !important; }}
+div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.4) !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important; }}
 
-/* Helper Text Bottom & Pushed Margin */
-.search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.9rem; margin-top: 14px; margin-bottom: 65px !important; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
+/* Helper Text Bottom */
+.search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 15px; margin-bottom: 50px !important; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
 
 /* Load More Button Styling */
 div[data-testid="stButton"] button {{ background: rgba(56,189,248,.08) !important; border: 1px dashed rgba(56,189,248,.4) !important; color: #38bdf8 !important; border-radius: 99px !important; font-weight: 700 !important; transition: all .2s !important; padding: 10px 24px !important; width: 100% !important; margin-top: 20px !important; }}
@@ -713,13 +713,13 @@ def run_hybrid_search(user_query, uploaded_file):
 
 # ─── Streamlit UI Forms & Execution ──────────────────────────────────────────
 with st.form("search_form", clear_on_submit=False):
+    # Perfect Vercel alignment: unified capsule containing text input & camera icon inside, with Search button on the right
     c_in, c_btn = st.columns([0.82, 0.18])
     with c_in:
-        user_query = st.text_input("Search", placeholder="Try 'Toyota Corolla', 'Kia Sportage 22'...", label_visibility="collapsed")
+        user_query = st.text_input("Search", placeholder="Try 'Toyota Corolla', 'Kia Sportage 22', 'Mercedes C180'...", label_visibility="collapsed")
+        uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
     with c_btn:
         submitted = st.form_submit_button("Search", use_container_width=True)
-
-uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
 
 st.markdown('<div class="search-helper-bottom">Type a car name above and press <b>Enter</b> — e.g. Toyota Corolla, Kia Sportage, Mercedes C180 — or upload a photo to search by image.</div>', unsafe_allow_html=True)
 
