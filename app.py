@@ -124,28 +124,28 @@ html, body, [data-testid="stAppViewContainer"] {{
 .hero-line {{ width: 54px; height: 3px; background: var(--blue); border-radius: 99px; margin: 14px auto 0 auto; box-shadow: 0 0 20px var(--blue-glow); }}
 .hero-sub {{ color: #d1d5db !important; font-size: 1rem !important; max-width: 660px; margin: 16px auto 25px auto !important; line-height: 1.6; text-align: center !important; text-shadow: 0 2px 10px rgba(0,0,0,0.8); display: block; }}
 
-/* Feature Row */
-.feat-row {{ display: flex; justify-content: center; max-width: 650px; margin: 0 auto 30px auto; }}
-.feat-item {{ text-align: center; padding: 5px 25px; border-right: 1px solid rgba(255,255,255,.12); }}
+/* Feature Row - 4 Items */
+.feat-row {{ display: flex; justify-content: center; max-width: 780px; margin: 0 auto 30px auto; }}
+.feat-item {{ text-align: center; padding: 5px 20px; border-right: 1px solid rgba(255,255,255,.12); }}
 .feat-item:last-child {{ border-right: none; }}
 .feat-icon {{ color: var(--blue); font-size: 1rem; margin-bottom: 3px; }}
 .feat-title {{ color: #fff; font-size: .8rem; font-weight: 700; }}
 .feat-desc {{ color: #9ca3af; font-size: .65rem; margin-top: 2px; }}
 
-/* --- 100% UNIFIED TRANSPARENT SEARCH BAR (NO SEPARATION) --- */
+/* --- SEARCH CAPSULE --- */
 [data-testid="stForm"] {{
-    background: rgba(8, 11, 18, 0.65) !important;
-    border: 1.2px solid rgba(56, 189, 248, 0.35) !important;
+    background: rgba(10, 13, 20, 0.75) !important;
+    border: 1.2px solid rgba(56, 189, 248, 0.4) !important;
     border-radius: 999px !important;
-    padding: 4px 10px !important;
+    padding: 6px 16px !important;
     max-width: 820px;
     margin: 0 auto 10px auto !important;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 16px 40px rgba(0,0,0,.65), inset 0 1px 0 rgba(56,189,248,.15);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 16px 40px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,.2);
 }}
 [data-testid="stForm"] [data-testid="stHorizontalBlock"] {{
     align-items: center !important;
-    gap: 0 !important;
+    gap: 12px !important;
 }}
 
 /* Text Input Inside Pill */
@@ -155,7 +155,7 @@ div[data-testid="stTextInput"] div[data-baseweb="input"] {{
     border: none !important;
     box-shadow: none !important;
 }}
-div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.02rem; padding-left: 8px; }}
+div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.05rem; padding-left: 5px; }}
 
 /* File Uploader Camera Icon Inside Pill */
 div[data-testid="stFileUploader"] label {{ display: none; }}
@@ -163,9 +163,9 @@ div[data-testid="stFileUploader"] section {{
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    min-height: 42px !important;
-    height: 42px !important;
-    width: 42px !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    width: 38px !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -178,7 +178,7 @@ div[data-testid="stFileUploader"] section::after {{
     font-size: 1.4rem;
     position: absolute;
     pointer-events: none;
-    opacity: 0.75;
+    opacity: 0.8;
     transition: opacity 0.2s;
 }}
 div[data-testid="stFileUploader"] section:hover::after {{ opacity: 1; }}
@@ -194,8 +194,8 @@ div[data-testid="stFileUploader"] > div:nth-child(2) {{ display: none !important
 
 /* Search Button Inside Pill */
 div[data-testid="stFormSubmitButton"] button {{
-    background: rgba(56, 189, 248, 0.14) !important;
-    border: 1px solid rgba(56, 189, 248, 0.6) !important;
+    background: rgba(56, 189, 248, 0.16) !important;
+    border: 1px solid #38bdf8 !important;
     color: #fff !important;
     border-radius: 999px !important;
     font-weight: 700 !important;
@@ -205,7 +205,7 @@ div[data-testid="stFormSubmitButton"] button {{
     font-size: .95rem;
     transition: all .2s;
 }}
-div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.35) !important; box-shadow: 0 0 14px rgba(56, 189, 248, 0.35) !important; }}
+div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.4) !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important; }}
 
 /* Helper Text Bottom */
 .search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 15px; margin-bottom: 40px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
@@ -257,7 +257,8 @@ st.markdown("""
 <div class="feat-row">
     <div class="feat-item"><div class="feat-icon">⌁</div><div class="feat-title">Analysis</div><div class="feat-desc">Understand your needs</div></div>
     <div class="feat-item"><div class="feat-icon">▧</div><div class="feat-title">Image Detection</div><div class="feat-desc">Identify car details</div></div>
-    <div class="feat-item"><div class="feat-icon">◇</div><div class="feat-title">Smart Results</div><div class="feat-desc">Best matches for you</div></div>
+    <div class="feat-item"><div class="feat-icon">◇</div><div class="feat-title">Price Insights</div><div class="feat-desc">Fair market estimates</div></div>
+    <div class="feat-item"><div class="feat-icon">▥</div><div class="feat-title">Smart Results</div><div class="feat-desc">Best matches for you</div></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -707,13 +708,13 @@ def run_hybrid_search(user_query, uploaded_file):
 
 # ─── Streamlit UI Forms & Execution ──────────────────────────────────────────
 with st.form("search_form", clear_on_submit=False):
-    c_in, c_up, c_btn = st.columns([0.68, 0.10, 0.22])
+    c_in, c_up, c_btn = st.columns([0.65, 0.12, 0.23])
     with c_in:
         user_query = st.text_input("Search", placeholder="e.g. Mercedes CLA 2022 factory paint in Zayed under 3 million", label_visibility="collapsed")
     with c_up:
         uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
     with c_btn:
-        submitted = st.form_submit_button("Search Market", use_container_width=True)
+        submitted = st.form_submit_button("Search", use_container_width=True)
 
 st.markdown('<div class="search-helper-bottom">Type a car name above and press <b>Enter</b> — e.g. Toyota Corolla, Kia Sportage, Mercedes C180 — or upload a photo to search by image.</div>', unsafe_allow_html=True)
 
