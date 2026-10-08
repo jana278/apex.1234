@@ -31,10 +31,9 @@ if 'last_results' not in st.session_state:
 if 'last_query' not in st.session_state:
     st.session_state.last_query = ""
 
-# 2. PyTorch & Transformers (LOCAL Vision Engine - No APIs)
+# 2. PyTorch & Transformers (LOCAL Vision Engine)
 try:
     import torch
-    # Optimize threads to prevent Streamlit RAM crash
     torch.set_num_threads(1)
     from transformers import AutoImageProcessor, AutoModelForImageClassification
     HAS_TORCH = True
@@ -117,7 +116,6 @@ html, body, [data-testid="stAppViewContainer"] {{
 .main .block-container {{ position: relative; z-index: 2; max-width: 1240px; padding: 2.5rem 1.25rem 5rem; }}
 #MainMenu, header, footer {{visibility: hidden !important; display: none !important;}}
 
-/* Inputs & Main Button */
 div[data-testid="stTextInput"] label {{ display: none; }}
 div[data-testid="stTextInput"] div[data-baseweb="input"] {{
     background: linear-gradient(180deg,rgba(15,23,42,.93),rgba(3,7,18,.97));
@@ -134,7 +132,6 @@ div[data-testid="stFormSubmitButton"] button {{
 div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56,189,248,.42); box-shadow: 0 0 14px rgba(56,189,248,.42); color:#fff; }}
 div[data-testid="stFileUploader"] label {{ display: none; }}
 
-/* Load More Button Styling */
 div[data-testid="stButton"] button {{
     background: rgba(56,189,248,.08) !important; border: 1px dashed rgba(56,189,248,.4) !important; color: #38bdf8 !important;
     border-radius: 99px !important; font-weight: 700 !important; transition: all .2s !important; padding: 10px 24px !important; width: 100% !important; margin-top: 20px !important;
@@ -610,11 +607,28 @@ def run_hybrid_search(user_query, uploaded_file):
             predicted.append(float(round(base * (0.925 ** age), 0)))
             
     df["predicted_fair_price"] = predicted
+
+    # ─── Live Market Calibration (Option 2) ──────────────────────────────────
+    valid_live_prices = pd.to_numeric(df['price'], errors='coerce').dropna()
+    valid_preds = pd.to_numeric(df['predicted_fair_price'], errors='coerce').dropna()
+    
+    if not valid_live_prices.empty and not valid_preds.empty:
+        median_live = valid_live_prices.median()
+        median_pred = valid_preds.median()
+        
+        if median_pred > 0:
+            calibration_ratio = median_live / median_pred
+            calibration_ratio = max(0.5, min(calibration_ratio, 2.5))
+            
+            df["predicted_fair_price"] = df["predicted_fair_price"].apply(
+                lambda x: float(round(x * calibration_ratio, 0)) if pd.notna(x) else x
+            )
+    # ─────────────────────────────────────────────────────────────────────────
     
     deal_labels = []
     for _, r in df.iterrows():
         p, f = r.get("price"), r.get("predicted_fair_price")
-        if p and f:
+        if pd.notna(p) and pd.notna(f):
             pct = (p - f) / f
             if pct <= -0.05: deal_labels.append("Great Deal 🔥")
             elif pct >= 0.08: deal_labels.append("Overpriced ⚠️")
@@ -627,7 +641,6 @@ def run_hybrid_search(user_query, uploaded_file):
         scores.append(calculate_match_score(brand, model, location, target_price, r))
     df["match_score"] = scores
     
-    # RETURN THE FULL DATAFRAME FOR LOAD MORE TO WORK
     return df, combined_query
 
 # ─── Streamlit UI Forms & Execution ──────────────────────────────────────────
@@ -674,11 +687,11 @@ if not st.session_state.last_results.empty or st.session_state.last_query != "":
                 badge_text = "Valuation N/A"
 
             km_val = r.get('mileage')
-            km_text = f"{float(km_val):,.0f} km" if km_val else "Not provided"
+            km_text = f"{float(km_val):,.0f} km" if pd.notna(km_val) else "Not provided"
             price_val = r.get('price')
-            price_text = f"{float(price_val):,.0f} EGP" if price_val else "On request"
+            price_text = f"{float(price_val):,.0f} EGP" if pd.notna(price_val) else "On request"
             fair_val = r.get('predicted_fair_price')
-            fair_text = f"{float(fair_val):,.0f} EGP" if fair_val else "N/A"
+            fair_text = f"{float(fair_val):,.0f} EGP" if pd.notna(fair_val) else "N/A"
             img_html = f'<img class="gallery-img" src="{r.get("image_url")}" onerror="this.style.display=\'none\'">' if r.get("image_url") else '<div class="no-photo">Photo unavailable</div>'
             link = r.get("item_url", "#")
             
