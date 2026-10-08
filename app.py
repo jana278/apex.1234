@@ -133,52 +133,43 @@ html, body, [data-testid="stAppViewContainer"] {{
 .feat-title {{ color: #fff; font-size: .8rem; font-weight: 700; }}
 .feat-desc {{ color: #9ca3af; font-size: .65rem; margin-top: 2px; }}
 
-/* --- PERFECT VERCEL-STYLE SEARCH CONTAINER --- */
+/* --- EXACT VERCEL UNIFIED SEARCH CAPSULE --- */
 [data-testid="stForm"] {{
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
+    background: rgba(10, 13, 20, 0.82) !important;
+    border: 1.5px solid rgba(56, 189, 248, 0.45) !important;
+    border-radius: 999px !important;
+    padding: 4px 6px 4px 18px !important;
     max-width: 820px;
     margin: 0 auto 10px auto !important;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 16px 40px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,0.25), 0 0 15px rgba(56,189,248,0.2) !important;
+    display: flex;
+    align-items: center;
 }}
 [data-testid="stForm"] [data-testid="stHorizontalBlock"] {{
     align-items: center !important;
-    gap: 12px !important;
+    gap: 10px !important;
+    width: 100% !important;
 }}
 
-/* The Oval Capsule Border & Background */
+/* Text Input Inside Capsule */
 div[data-testid="stTextInput"] label {{ display: none; }}
 div[data-testid="stTextInput"] div[data-baseweb="input"] {{
-    background: rgba(10, 13, 20, 0.85) !important;
-    border: 1.5px solid #38bdf8 !important;
-    border-radius: 999px !important;
-    padding: 4px 45px 4px 18px !important;
-    backdrop-filter: blur(14px);
-    box-shadow: 0 16px 40px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,0.25), 0 0 12px rgba(56,189,248,0.25) !important;
-    height: 44px !important;
-    display: flex;
-    align-items: center;
-    position: relative;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }}
 div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.05rem; }}
 
-/* File Uploader Camera Icon (Inside Capsule on the Right) */
-div[data-testid="stFileUploader"] {{
-    position: absolute !important;
-    right: 25% !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    z-index: 10 !important;
-    width: 36px !important;
-}}
+/* File Uploader Camera Icon (Inside Capsule on the Right)[cite: 10] */
 div[data-testid="stFileUploader"] label {{ display: none; }}
 div[data-testid="stFileUploader"] section {{
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    min-height: 34px !important;
-    height: 34px !important;
-    width: 34px !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    width: 38px !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -187,10 +178,10 @@ div[data-testid="stFileUploader"] section {{
 }}
 div[data-testid="stFileUploader"] section::after {{
     content: '📷';
-    font-size: 1.25rem;
+    font-size: 1.3rem;
     position: absolute;
     pointer-events: none;
-    opacity: 0.9;
+    opacity: 0.85;
     transition: opacity 0.2s;
 }}
 div[data-testid="stFileUploader"] section:hover::after {{ opacity: 1; }}
@@ -204,9 +195,9 @@ div[data-testid="stFileUploader"] section button {{
 }}
 div[data-testid="stFileUploader"] > div:nth-child(2) {{ display: none !important; }}
 
-/* Search Button (Compact & Proportional to Vercel) */
+/* Search Button Inside Capsule (Exact Vercel Style)[cite: 10] */
 div[data-testid="stFormSubmitButton"] button {{
-    background: rgba(56, 189, 248, 0.16) !important;
+    background: rgba(56, 189, 248, 0.18) !important;
     border: 1px solid #38bdf8 !important;
     color: #fff !important;
     border-radius: 999px !important;
@@ -217,7 +208,7 @@ div[data-testid="stFormSubmitButton"] button {{
     font-size: 0.95rem;
     transition: all .2s;
 }}
-div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.4) !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important; }}
+div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.42) !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important; }}
 
 /* Helper Text Bottom */
 .search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 15px; margin-bottom: 50px !important; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
@@ -720,7 +711,7 @@ def run_hybrid_search(user_query, uploaded_file):
 
 # ─── Streamlit UI Forms & Execution ──────────────────────────────────────────
 with st.form("search_form", clear_on_submit=False):
-    c_in, c_up, c_btn = st.columns([0.72, 0.08, 0.20])
+    c_in, c_up, c_btn = st.columns([0.68, 0.08, 0.24])
     with c_in:
         user_query = st.text_input("Search", placeholder="Try 'Toyota Corolla', 'Kia Sportage 22'...", label_visibility="collapsed")
     with c_up:
