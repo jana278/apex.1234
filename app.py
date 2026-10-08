@@ -113,40 +113,40 @@ html, body, [data-testid="stAppViewContainer"] {{
                 linear-gradient(180deg,rgba(3,7,18,.35) 0%,rgba(3,7,18,.15) 46%,rgba(3,7,18,.92) 100%);
 }}
 
-.main .block-container {{ position: relative; z-index: 2; max-width: 1240px; padding: 0.5rem 1.25rem 5rem !important; }}
+.main .block-container {{ position: relative; z-index: 2; max-width: 1240px; padding: 0.8rem 1.25rem 5rem !important; }}
 #MainMenu, header, footer {{visibility: hidden !important; display: none !important;}}
 
-/* --- COMPACT HERO SECTION (Pushed Up & Exact Vercel Spacing) --- */
-.hero {{ text-align: center !important; margin-bottom: 0.5rem !important; display: flex; flex-direction: column; align-items: center; padding-top: 0px !important; }}
-.hero-pill {{ display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 4px 14px; margin: 0 auto 8px auto !important; border: 1px solid rgba(56,189,248,.28); border-radius: 999px; background: rgba(15,23,42,.72); color: #e2e8f0; font-size: .7rem; font-weight: 800; letter-spacing: 2px; backdrop-filter: blur(10px); }}
-.hero h1 {{ color: #fff; font-size: clamp(2.8rem, 5vw, 4.2rem); font-weight: 800; letter-spacing: -2px; line-height: 1.05; margin: 0; text-align: center !important; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }}
+/* --- HERO SECTION (Exact Vercel Font Sizes & Spacing) --- */
+.hero {{ text-align: center !important; margin-bottom: 0.8rem !important; display: flex; flex-direction: column; align-items: center; padding-top: 0px !important; }}
+.hero-pill {{ display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 6px 18px; margin: 0 auto 12px auto !important; border: 1.2px solid rgba(56,189,248,.32); border-radius: 999px; background: rgba(15,23,42,.75); color: #e2e8f0; font-size: 0.8rem; font-weight: 800; letter-spacing: 2.5px; backdrop-filter: blur(10px); }}
+.hero h1 {{ color: #fff; font-size: clamp(3.5rem, 6.5vw, 5.2rem); font-weight: 800; letter-spacing: -2.5px; line-height: 1.05; margin: 0; text-align: center !important; text-shadow: 0 4px 25px rgba(0,0,0,0.85); }}
 .apex-white {{ color: #ffffff !important; }}
-.hero h1 span {{ color: var(--blue); text-shadow: 0 0 30px rgba(56,189,248,.5); }}
-.hero-line {{ width: 50px; height: 3px; background: var(--blue); border-radius: 99px; margin: 6px auto 0 auto !important; box-shadow: 0 0 20px var(--blue-glow); }}
-.hero-sub {{ color: #d1d5db !important; font-size: 0.95rem !important; max-width: 620px; margin: 8px auto 14px auto !important; line-height: 1.4; text-align: center !important; text-shadow: 0 2px 10px rgba(0,0,0,0.8); display: block; }}
+.hero h1 span {{ color: var(--blue); text-shadow: 0 0 35px rgba(56,189,248,.6); }}
+.hero-line {{ width: 60px; height: 3.5px; background: var(--blue); border-radius: 99px; margin: 8px auto 0 auto !important; box-shadow: 0 0 22px var(--blue-glow); }}
+.hero-sub {{ color: #cbd5e1 !important; font-size: 1.1rem !important; max-width: 700px; margin: 12px auto 18px auto !important; line-height: 1.5; text-align: center !important; text-shadow: 0 2px 12px rgba(0,0,0,0.85); display: block; }}
 
-/* Feature Row - 4 Items */
-.feat-row {{ display: flex; justify-content: center; max-width: 750px; margin: 0 auto 15px auto !important; }}
-.feat-item {{ text-align: center; padding: 4px 18px; border-right: 1px solid rgba(255,255,255,.12); }}
+/* Feature Row - 4 Items (Vercel Exact Sizing) */
+.feat-row {{ display: flex; justify-content: center; max-width: 820px; margin: 0 auto 22px auto !important; }}
+.feat-item {{ text-align: center; padding: 6px 22px; border-right: 1px solid rgba(255,255,255,.14); }}
 .feat-item:last-child {{ border-right: none; }}
-.feat-icon {{ color: var(--blue); font-size: 0.95rem; margin-bottom: 2px; }}
-.feat-title {{ color: #fff; font-size: .75rem; font-weight: 700; }}
-.feat-desc {{ color: #9ca3af; font-size: .6rem; margin-top: 1px; }}
+.feat-icon {{ color: var(--blue); font-size: 1.1rem; margin-bottom: 4px; }}
+.feat-title {{ color: #fff; font-size: 0.88rem; font-weight: 700; }}
+.feat-desc {{ color: #94a3b8; font-size: 0.73rem; margin-top: 2px; }}
 
 /* --- SEARCH CAPSULE --- */
 [data-testid="stForm"] {{
-    background: rgba(10, 13, 20, 0.75) !important;
-    border: 1.2px solid rgba(56, 189, 248, 0.4) !important;
+    background: rgba(10, 13, 20, 0.78) !important;
+    border: 1.3px solid rgba(56, 189, 248, 0.45) !important;
     border-radius: 999px !important;
-    padding: 4px 14px !important;
-    max-width: 820px;
-    margin: 0 auto 6px auto !important;
+    padding: 6px 18px !important;
+    max-width: 860px;
+    margin: 0 auto 8px auto !important;
     backdrop-filter: blur(14px);
-    box-shadow: 0 16px 40px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,.2);
+    box-shadow: 0 18px 45px rgba(0,0,0,.78), inset 0 1px 0 rgba(56,189,248,.22);
 }}
 [data-testid="stForm"] [data-testid="stHorizontalBlock"] {{
     align-items: center !important;
-    gap: 12px !important;
+    gap: 14px !important;
 }}
 
 /* Text Input Inside Pill */
@@ -156,7 +156,7 @@ div[data-testid="stTextInput"] div[data-baseweb="input"] {{
     border: none !important;
     box-shadow: none !important;
 }}
-div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.02rem; padding-left: 5px; }}
+div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.1rem; padding-left: 6px; }}
 
 /* File Uploader Camera Icon Inside Pill */
 div[data-testid="stFileUploader"] label {{ display: none; }}
@@ -164,9 +164,9 @@ div[data-testid="stFileUploader"] section {{
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    min-height: 36px !important;
-    height: 36px !important;
-    width: 36px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    width: 40px !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -176,10 +176,10 @@ div[data-testid="stFileUploader"] section {{
 }}
 div[data-testid="stFileUploader"] section::after {{
     content: '📷';
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     position: absolute;
     pointer-events: none;
-    opacity: 0.8;
+    opacity: 0.85;
     transition: opacity 0.2s;
 }}
 div[data-testid="stFileUploader"] section:hover::after {{ opacity: 1; }}
@@ -195,21 +195,21 @@ div[data-testid="stFileUploader"] > div:nth-child(2) {{ display: none !important
 
 /* Search Button Inside Pill */
 div[data-testid="stFormSubmitButton"] button {{
-    background: rgba(56, 189, 248, 0.16) !important;
+    background: rgba(56, 189, 248, 0.18) !important;
     border: 1px solid #38bdf8 !important;
     color: #fff !important;
     border-radius: 999px !important;
     font-weight: 700 !important;
-    height: 40px !important;
+    height: 44px !important;
     margin: 0 !important;
     width: 100% !important;
-    font-size: .95rem;
+    font-size: 1rem;
     transition: all .2s;
 }}
-div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.4) !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important; }}
+div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.42) !important; box-shadow: 0 0 16px rgba(56, 189, 248, 0.45) !important; }}
 
 /* Helper Text Bottom & Pushed Margin */
-.search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.82rem; margin-top: 10px; margin-bottom: 60px !important; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
+.search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.9rem; margin-top: 14px; margin-bottom: 65px !important; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
 
 /* Load More Button Styling */
 div[data-testid="stButton"] button {{ background: rgba(56,189,248,.08) !important; border: 1px dashed rgba(56,189,248,.4) !important; color: #38bdf8 !important; border-radius: 99px !important; font-weight: 700 !important; transition: all .2s !important; padding: 10px 24px !important; width: 100% !important; margin-top: 20px !important; }}
