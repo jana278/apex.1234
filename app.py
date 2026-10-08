@@ -133,7 +133,7 @@ html, body, [data-testid="stAppViewContainer"] {{
 .feat-title {{ color: #fff; font-size: .8rem; font-weight: 700; }}
 .feat-desc {{ color: #9ca3af; font-size: .65rem; margin-top: 2px; }}
 
-/* --- VERCEL EXACT OVAL CAPSULE & BUTTON CONTAINER --- */
+/* --- PERFECT VERCEL-STYLE SEARCH CONTAINER --- */
 [data-testid="stForm"] {{
     background: transparent !important;
     border: none !important;
@@ -146,34 +146,42 @@ html, body, [data-testid="stAppViewContainer"] {{
     gap: 12px !important;
 }}
 
-/* The Oval Search Capsule Background & Border */
+/* The Oval Capsule Border & Background */
 div[data-testid="stTextInput"] label {{ display: none; }}
 div[data-testid="stTextInput"] div[data-baseweb="input"] {{
     background: rgba(10, 13, 20, 0.85) !important;
-    border: 1.2px solid rgba(56, 189, 248, 0.45) !important;
+    border: 1.5px solid rgba(56, 189, 248, 0.45) !important;
     border-radius: 999px !important;
-    padding: 6px 16px 6px 18px !important;
+    padding: 6px 45px 6px 18px !important;
     backdrop-filter: blur(14px);
     box-shadow: 0 16px 40px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,0.2);
     height: 50px !important;
     display: flex;
     align-items: center;
+    position: relative;
 }}
 div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.05rem; }}
 
 /* File Uploader Camera Icon (Inside Capsule on the Right) */
+div[data-testid="stFileUploader"] {{
+    position: absolute !important;
+    right: 25% !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10 !important;
+    width: 40px !important;
+}}
 div[data-testid="stFileUploader"] label {{ display: none; }}
 div[data-testid="stFileUploader"] section {{
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    min-height: 40px !important;
-    height: 40px !important;
-    width: 40px !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    width: 38px !important;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: auto;
     cursor: pointer;
     position: relative;
 }}
@@ -181,9 +189,8 @@ div[data-testid="stFileUploader"] section::after {{
     content: '📷';
     font-size: 1.35rem;
     position: absolute;
-    right: 4px;
     pointer-events: none;
-    opacity: 0.8;
+    opacity: 0.85;
     transition: opacity 0.2s;
 }}
 div[data-testid="stFileUploader"] section:hover::after {{ opacity: 1; }}
@@ -713,10 +720,10 @@ def run_hybrid_search(user_query, uploaded_file):
 
 # ─── Streamlit UI Forms & Execution ──────────────────────────────────────────
 with st.form("search_form", clear_on_submit=False):
-    # Perfect Vercel alignment: unified capsule containing text input & camera icon inside, with Search button on the right
-    c_in, c_btn = st.columns([0.82, 0.18])
+    c_in, c_up, c_btn = st.columns([0.65, 0.12, 0.23])
     with c_in:
-        user_query = st.text_input("Search", placeholder="Try 'Toyota Corolla', 'Kia Sportage 22', 'Mercedes C180'...", label_visibility="collapsed")
+        user_query = st.text_input("Search", placeholder="Try 'Toyota Corolla', 'Kia Sportage 22'...", label_visibility="collapsed")
+    with c_up:
         uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
     with c_btn:
         submitted = st.form_submit_button("Search", use_container_width=True)
