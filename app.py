@@ -23,6 +23,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# ─── Initialize Session State for Load More ────────────────────────────────
+if 'show_count' not in st.session_state:
+    st.session_state.show_count = 12
+if 'last_results' not in st.session_state:
+    st.session_state.last_results = pd.DataFrame()
+if 'last_query' not in st.session_state:
+    st.session_state.last_query = ""
+
 # 2. PyTorch & Transformers (LOCAL Vision Engine - No APIs)
 try:
     import torch
@@ -109,6 +117,7 @@ html, body, [data-testid="stAppViewContainer"] {{
 .main .block-container {{ position: relative; z-index: 2; max-width: 1240px; padding: 2.5rem 1.25rem 5rem; }}
 #MainMenu, header, footer {{visibility: hidden !important; display: none !important;}}
 
+/* Inputs & Main Button */
 div[data-testid="stTextInput"] label {{ display: none; }}
 div[data-testid="stTextInput"] div[data-baseweb="input"] {{
     background: linear-gradient(180deg,rgba(15,23,42,.93),rgba(3,7,18,.97));
@@ -117,12 +126,20 @@ div[data-testid="stTextInput"] div[data-baseweb="input"] {{
     box-shadow: 0 16px 48px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,.18);
 }}
 div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.05rem; }}
+
 div[data-testid="stFormSubmitButton"] button {{
     background: rgba(56,189,248,.16); border: 1px solid #38bdf8; color: #fff;
     border-radius: 999px; font-weight: 700; transition: all .2s; margin-top: 10px;
 }}
 div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56,189,248,.42); box-shadow: 0 0 14px rgba(56,189,248,.42); color:#fff; }}
 div[data-testid="stFileUploader"] label {{ display: none; }}
+
+/* Load More Button Styling */
+div[data-testid="stButton"] button {{
+    background: rgba(56,189,248,.08) !important; border: 1px dashed rgba(56,189,248,.4) !important; color: #38bdf8 !important;
+    border-radius: 99px !important; font-weight: 700 !important; transition: all .2s !important; padding: 10px 24px !important; width: 100% !important; margin-top: 20px !important;
+}}
+div[data-testid="stButton"] button:hover {{ background: rgba(56,189,248,.22) !important; border: 1px solid #38bdf8 !important; box-shadow: 0 0 16px rgba(56,189,248,.25) !important; color:#fff !important; }}
 
 .hero {{ text-align: center; margin-bottom: 1.5rem; }}
 .hero-pill {{ display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; margin-bottom: 14px; border: 1px solid rgba(56,189,248,.28); border-radius: 999px; background: rgba(15,23,42,.72); color: #e2e8f0; font-size: .72rem; font-weight: 800; letter-spacing: 2px; backdrop-filter: blur(10px); }}
@@ -381,7 +398,8 @@ class MarketScraper:
         
         urls_to_scrape = [
             f"{self.h_base}/ar/car/{b}/{m}" if m else f"{self.h_base}/ar/car/{b}",
-            f"{self.h_base}/ar/car/{b}/{m}/page/2" if m else f"{self.h_base}/ar/car/{b}/page/2"
+            f"{self.h_base}/ar/car/{b}/{m}/page/2" if m else f"{self.h_base}/ar/car/{b}/page/2",
+            f"{self.h_base}/ar/car/{b}/{m}/page/3" if m else f"{self.h_base}/ar/car/{b}/page/3"
         ]
         
         seen_urls = set()
@@ -609,7 +627,8 @@ def run_hybrid_search(user_query, uploaded_file):
         scores.append(calculate_match_score(brand, model, location, target_price, r))
     df["match_score"] = scores
     
-    return df.head(12), combined_query
+    # RETURN THE FULL DATAFRAME FOR LOAD MORE TO WORK
+    return df, combined_query
 
 # ─── Streamlit UI Forms & Execution ──────────────────────────────────────────
 with st.form("search_form", clear_on_submit=False):
@@ -621,17 +640,25 @@ with st.form("search_form", clear_on_submit=False):
 
     submitted = st.form_submit_button("Search Market", use_container_width=True)
 
-if submitted or user_query or uploaded_file:
+if submitted:
     with st.spinner("Analyzing and fetching market data..."):
         df_res, final_q = run_hybrid_search(user_query, uploaded_file)
-        
+        st.session_state.last_results = df_res
+        st.session_state.last_query = final_q
+        st.session_state.show_count = 12
+
+if not st.session_state.last_results.empty or st.session_state.last_query != "":
+    df_display = st.session_state.last_results
+    final_q = st.session_state.last_query
+
     st.markdown(f'<div style="color:#fff; font-size:1.15rem; font-weight:700; margin:35px auto 15px; max-width:1200px;">🎯 Live Market Results for: "{final_q}"</div>', unsafe_allow_html=True)
     
-    if df_res.empty:
+    if df_display.empty:
         st.info("No matching vehicle listings found for your search criteria.")
     else:
+        current_df = df_display.iloc[:st.session_state.show_count]
         html_cards = ""
-        for _, r in df_res.iterrows():
+        for _, r in current_df.iterrows():
             deal = r.get('deal_label', 'N/A')
             if "Great Deal" in deal:
                 badge_class = "badge-great"
@@ -686,3 +713,10 @@ if submitted or user_query or uploaded_file:
             html_cards += card_html
             
         st.markdown(f'<div class="grid">{html_cards}</div>', unsafe_allow_html=True)
+
+        if st.session_state.show_count < len(df_display):
+            _, col_btn, _ = st.columns([1, 1, 1])
+            with col_btn:
+                if st.button("Load More Vehicles ↓", use_container_width=True):
+                    st.session_state.show_count += 12
+                    st.rerun()
