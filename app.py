@@ -12,7 +12,6 @@ import requests
 from bs4 import BeautifulSoup
 import joblib
 import urllib.parse
-from urllib.parse import urljoin, urlparse
 
 # 1. Streamlit Initialization
 import streamlit as st
@@ -46,18 +45,23 @@ class ApexProductionValuationEngine:
 import sys
 sys.modules['__main__'].ApexProductionValuationEngine = ApexProductionValuationEngine
 
+try:
+    from catboost import Pool
+    HAS_CATBOOST = True
+except ImportError:
+    HAS_CATBOOST = False
+    Pool = None
+
 @st.cache_resource(show_spinner=False)
 def load_catboost():
-    try:
-        from catboost import Pool
-        model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "apex_catboost_valuation.joblib")
-        if not os.path.exists(model_path): model_path = "apex_catboost_valuation.joblib"
-        if os.path.exists(model_path):
-            return joblib.load(model_path), Pool
-    except Exception: pass
-    return None, None
+    model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "apex_catboost_valuation.joblib")
+    if not os.path.exists(model_path): model_path = "apex_catboost_valuation.joblib"
+    if os.path.exists(model_path):
+        try: return joblib.load(model_path)
+        except Exception: pass
+    return None
 
-full_pricing_pipeline, CB_Pool = load_catboost()
+full_pricing_pipeline = load_catboost()
 
 # ─── UI & CSS Setup ────────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
@@ -353,14 +357,12 @@ class MarketScraper:
         self.h_base = "https://eg.hatla2ee.com"
 
     def fetch_html(self, url):
-        # 1. Direct Request
         try:
             r = self.session.get(url, headers=self.headers, timeout=8)
             if r.status_code == 200 and "cloudflare" not in r.text.lower() and "attention required" not in r.text.lower():
                 return r.text
         except: pass
         
-        # 2. Proxy Bypass if blocked
         try:
             proxy_url = f"https://api.allorigins.win/get?url={urllib.parse.quote(url)}"
             r = requests.get(proxy_url, timeout=12)
@@ -516,7 +518,6 @@ def run_hybrid_search(user_query, uploaded_file):
     detected_car = ""
     if uploaded_file:
         try:
-            # PURE LOCAL PYTORCH ONLY
             detected_car = classify_car_image(uploaded_file.getvalue())
         except Exception as e: print("Vision Failed:", e)
     
@@ -555,12 +556,11 @@ def run_hybrid_search(user_query, uploaded_file):
         df = df.sort_values("price_dist", ascending=True)
         
     predicted = []
-    if full_pricing_pipeline is not None and HAS_CATBOOST and CB_Pool is not None:
+    if full_pricing_pipeline is not None and HAS_CATBOOST and Pool is not None:
         try:
             eval_df = df.copy()
             num_cols = ["year", "mileage", "car_age", "km_per_year"]
             cat_cols = ["brand", "model", "location", "transmission", "fuel_type", "car_condition", "condition_tag", "trim_tier"]
-            medians = full_pricing_pipeline.medians
             
             eval_df['year'] = pd.to_numeric(eval_df.get('year'), errors='coerce').fillna(2016.0)
             eval_df['mileage'] = pd.to_numeric(eval_df.get('mileage'), errors='coerce').fillna(122000.0)
@@ -568,11 +568,13 @@ def run_hybrid_search(user_query, uploaded_file):
             eval_df['km_per_year'] = np.where(eval_df['car_age'] > 0, eval_df['mileage'] / eval_df['car_age'].replace(0, 1), eval_df['mileage'])
             for c in cat_cols: eval_df[c] = eval_df.get(c, "Missing").fillna("Missing").astype(str).str.title()
             
-            pool = CB_Pool(eval_df[num_cols + cat_cols], cat_features=cat_cols)
+            pool = Pool(eval_df[num_cols + cat_cols], cat_features=cat_cols)
             preds_log = full_pricing_pipeline.model.predict(pool)
             preds_egp = np.expm1(preds_log)
             predicted = [float(np.round(p, 0)) if p > 0 else None for p in preds_egp]
-        except Exception: predicted = [None] * len(df)
+        except Exception as e: 
+            print("Valuation error:", e)
+            predicted = [None] * len(df)
     else:
         for _, r in df.iterrows():
             base = {"mercedes":3000000,"bmw":2900000,"audi":2800000,"kia":1800000,"hyundai":1700000,"toyota":1750000}.get(str(r.get("brand")).lower(), 1500000)
@@ -643,7 +645,6 @@ if submitted or user_query or uploaded_file:
             img_html = f'<img class="gallery-img" src="{r.get("image_url")}" onerror="this.style.display=\'none\'">' if r.get("image_url") else '<div class="no-photo">Photo unavailable</div>'
             link = r.get("item_url", "#")
             
-            # NO INDENTATION BELOW TO PREVENT STREAMLIT FROM PARSING AS CODE BLOCK!
             card_html = f"""<div class="card">
 <div class="gallery">{img_html}</div>
 <div class="card-body">
