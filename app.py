@@ -144,7 +144,7 @@ html, body, [data-testid="stAppViewContainer"] {{
     backdrop-filter: blur(16px);
     box-shadow: 0 16px 40px rgba(0,0,0,.75), inset 0 1px 0 rgba(56,189,248,0.25), 0 0 15px rgba(56,189,248,0.2) !important;
     display: flex;
-    align-items: center;
+    flex-direction: column;
 }}
 [data-testid="stForm"] [data-testid="stHorizontalBlock"] {{
     align-items: center !important;
@@ -156,10 +156,18 @@ html, body, [data-testid="stAppViewContainer"] {{
 div[data-testid="stTextInput"] label {{ display: none; }}
 div[data-testid="stTextInput"] div[data-baseweb="input"] {{
     background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    height: 48px !important;
+    display: flex;
+    align-items: center;
 }}
-div[data-testid="stTextInput"] input {{ color: #fff; font-size: 1.05rem; }}
+div[data-testid="stTextInput"] input {{
+    background-color: transparent !important;
+    color: #fff !important;
+    font-size: 1.05rem !important;
+}}
 
 /* File Uploader Camera Icon (Inside Capsule on the Right)[cite: 10] */
 div[data-testid="stFileUploader"] label {{ display: none; }}
@@ -193,7 +201,7 @@ div[data-testid="stFileUploader"] section button {{
     display: none !important;
     opacity: 0 !important;
 }}
-div[data-testid="stFileUploader"] > div:nth-child(2) {{ display: none !important; }}
+/* REMOVED the line that was hiding the file preview box here so it works! */
 
 /* Search Button Inside Capsule (Exact Vercel Style)[cite: 10] */
 div[data-testid="stFormSubmitButton"] button {{
@@ -209,6 +217,9 @@ div[data-testid="stFormSubmitButton"] button {{
     transition: all .2s;
 }}
 div[data-testid="stFormSubmitButton"] button:hover {{ background: rgba(56, 189, 248, 0.42) !important; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4) !important; }}
+
+/* Vision Status Banner */
+.vision-status {{ display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; font-weight: 600; margin-top: 5px; margin-bottom: 5px; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
 
 /* Helper Text Bottom */
 .search-helper-bottom {{ text-align: center; color: #94a3b8; font-size: 0.85rem; margin-top: 15px; margin-bottom: 50px !important; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }}
@@ -532,7 +543,7 @@ class MarketScraper:
                             "location": loc_name, 
                             "transmission": "Manual" if any(t in card_text_space for t in ["يدوي","مانيوال","Manual"]) else "Automatic",
                             "condition_tag": "Factory Paint" if any(k in card_text_space for k in ["فابريكا", "فبريكة", "زيرو", "factory paint"]) else "Normal", 
-                            "trim_tier": "Topline" if any(k in card_text_space.lower() for k in ["اعلى فئة", "توب لاين", "topline", "بانوراما"]) else "Standard",
+                            "trim_tier": "Topline" if any(k in card_text_space.lower() for k in ["اعلى فئة", "tوب لاين", "topline", "بانوراما"]) else "Standard",
                             "source": "Hatla2ee", "item_url": full_link, "image_url": image_url
                         })
                     except Exception: pass
@@ -711,13 +722,16 @@ def run_hybrid_search(user_query, uploaded_file):
 
 # ─── Streamlit UI Forms & Execution ──────────────────────────────────────────
 with st.form("search_form", clear_on_submit=False):
-    c_in, c_up, c_btn = st.columns([0.68, 0.08, 0.24])
+    c_in, c_up, c_btn = st.columns([0.65, 0.12, 0.23])
     with c_in:
         user_query = st.text_input("Search", placeholder="Try 'Toyota Corolla', 'Kia Sportage 22'...", label_visibility="collapsed")
     with c_up:
         uploaded_file = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
     with c_btn:
         submitted = st.form_submit_button("Search", use_container_width=True)
+
+    if uploaded_file is not None:
+        st.markdown('<div class="vision-status" style="color: #fbbf24;">⚡ Analyzing vehicle with AI Vision...</div>', unsafe_allow_html=True)
 
 st.markdown('<div class="search-helper-bottom">Type a car name above and press <b>Enter</b> — e.g. Toyota Corolla, Kia Sportage, Mercedes C180 — or upload a photo to search by image.</div>', unsafe_allow_html=True)
 
